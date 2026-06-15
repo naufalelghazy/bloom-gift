@@ -6,7 +6,12 @@ export interface GiftContent {
 }
 
 export interface GiftTheme {
-  palette: 'pink' | 'red' | 'blue' | 'yellow' | 'white' | 'mixed';
+  palette: 'pink' | 'red' | 'blue' | 'yellow' | 'white' | 'mixed' | 'custom';
+  customColors?: {
+    from: string;
+    via?: string;
+    to: string;
+  };
   flowerStyle: string;
   fontFamily: string;
 }
@@ -17,10 +22,23 @@ export interface GiftSecurity {
   hint?: string;
 }
 
+export interface ConfessionConfig {
+  whispers: string[];
+  scrollMessage: string;
+  question: string;
+  yesLabel: string;
+  noLabel: string;
+  certificateTitle: string;
+  certificateBody: string;
+  senderName?: string;
+  recipientName?: string;
+}
+
 export interface GiftData {
   id: string;
   slug: string;
   status: 'draft' | 'active' | 'expired';
+  templateId?: 'museum' | 'confession';
   theme: GiftTheme;
   security: GiftSecurity;
   musicUrl: string;
@@ -29,6 +47,7 @@ export interface GiftData {
     subtitle: string;
   };
   content: GiftContent[];
+  confession?: ConfessionConfig;
   finale: {
     message: string;
     bouquetType: string;
@@ -45,6 +64,7 @@ export const mockGifts: Record<string, GiftData> = {
       flowerStyle: 'rose',
       fontFamily: 'font-serif'
     },
+    templateId: 'museum',
     security: {
       gateType: 'pin',
       passcode: '1206',

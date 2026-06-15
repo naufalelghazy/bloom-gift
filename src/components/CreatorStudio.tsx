@@ -26,9 +26,10 @@ import GiftViewer from './GiftViewer';
 import { supabase } from '@/lib/supabaseClient';
 
 const PRESET_SONGS = [
-  { name: 'Relaxing Acoustic Guitar', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { name: 'Soft Piano Lofi', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-  { name: 'Sweet Cinematic Instrumental', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' }
+  { name: 'Warm Acoustic Guitar (Morning)', url: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Morning.mp3' },
+  { name: 'Romantic Guitar & Cello (Evening)', url: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Evening.mp3' },
+  { name: 'Soft Piano Jazz Lofi (Late Night Radio)', url: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Late%20Night%20Radio.mp3' },
+  { name: 'Relaxing Acoustic & Piano (Pleasant Porridge)', url: 'https://incompetech.com/music/royalty-free/mp3-royaltyfree/Pleasant%20Porridge.mp3' }
 ];
 
 const PALETTES = [
@@ -36,7 +37,16 @@ const PALETTES = [
   { id: 'red', name: 'Warm Red', bg: 'bg-red-100', text: 'text-red-500' },
   { id: 'blue', name: 'Dreamy Blue', bg: 'bg-sky-100', text: 'text-sky-500' },
   { id: 'yellow', name: 'Bright Yellow', bg: 'bg-amber-100', text: 'text-amber-500' },
-  { id: 'mixed', name: 'Soft Rainbow', bg: 'bg-gradient-to-r from-rose-100 via-indigo-100 to-amber-100', text: 'text-stone-600' }
+  { id: 'mixed', name: 'Soft Rainbow', bg: 'bg-gradient-to-r from-rose-100 via-indigo-100 to-amber-100', text: 'text-stone-600' },
+  { id: 'custom', name: 'Kustom', bg: 'bg-gradient-to-tr from-rose-300 via-indigo-300 to-amber-300', text: 'text-stone-700' }
+];
+
+const ANIMATIONS = [
+  { id: 'rose', name: 'Mawar Mekar', desc: 'Animasi kelopak bunga klasik', icon: '🌸' },
+  { id: 'heart', name: 'Detak Jantung', desc: 'Animasi hati yang berdenyut', icon: '❤️' },
+  { id: 'fireworks', name: 'Kembang Api', desc: 'Pancaran cahaya meriah', icon: '✨' },
+  { id: 'scroll', name: 'Surat Kerajaan', desc: 'Animasi gulungan naskah klasik', icon: '📜' },
+  { id: 'envelope', name: 'Amplop Kerajaan', desc: 'Buka surat dengan segel lilin merah', icon: '✉️' }
 ];
 
 export default function CreatorStudio() {
@@ -48,15 +58,23 @@ export default function CreatorStudio() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveLocation, setSaveLocation] = useState<'cloud' | 'local' | null>(null);
   const [isUploading, setIsUploading] = useState<Record<number, boolean>>({});
+  const [isMusicUploading, setIsMusicUploading] = useState(false);
+  const [uploadedMusicName, setUploadedMusicName] = useState('');
 
   const [giftData, setGiftData] = useState<GiftData>({
     id: '',
     slug: '',
     status: 'active',
+    templateId: 'museum',
     theme: {
       palette: 'pink',
       flowerStyle: 'rose',
-      fontFamily: 'font-serif'
+      fontFamily: 'font-serif',
+      customColors: {
+        from: '#ffe4e6',
+        via: '#fbcfe8',
+        to: '#f472b6'
+      }
     },
     security: {
       gateType: 'pin',
@@ -79,6 +97,23 @@ export default function CreatorStudio() {
         caption: 'Ini kenangan kecil kita.'
       }
     ],
+    confession: {
+      whispers: [
+        "Aku nggak tahu ini kelihatan berani atau nekat, tapi aku mau jujur.",
+        "Kamu tuh punya bakat bikin hari biasa jadi kerasa lucu sendiri.",
+        "Aku suka cara kamu hadir, bahkan pas cuma lewat chat singkat.",
+        "Jadi kalau akhir-akhir ini aku agak salting, ya... tersangkanya kamu.",
+        "Oke, tarik napas dulu. Habis ini ada pertanyaan penting."
+      ],
+      scrollMessage: "Dear Kamu,\n\nAku nggak mau bikin ini kaku kayak pidato. Intinya, aku nyaman banget sama kamu. Cara kamu ketawa, cara kamu balas hal kecil, semuanya bikin aku pengin lebih sering ada di cerita kamu.\n\nJadi kalau kamu juga mau, aku pengin kita coba jalan bareng. Pelan-pelan aja, tapi beneran.",
+      question: "Mau jadi pacarku?",
+      yesLabel: "Iya, gas! 💖",
+      noLabel: "Mikir dulu... 🥺",
+      certificateTitle: "Sertifikat Jadi Kita",
+      certificateBody: "Dengan ini kita resmi boleh saling bikin salting, saling kabarin, dan pelan-pelan punya cerita yang cuma kita yang paham. Dari Raka, buat Nara. Simpan baik-baik ya. Screenshot ini, terus kirim ke Raka.",
+      senderName: "Raka",
+      recipientName: "Nara"
+    },
     finale: {
       message: 'Terima kasih sudah membaca sampai akhir. I love you!',
       bouquetType: 'pink_roses'
@@ -86,12 +121,29 @@ export default function CreatorStudio() {
   });
 
   // Handle updates to nested objects
-  const updateTheme = (field: string, value: string) => {
+  const updateTheme = (field: string, value: any) => {
     setGiftData((prev) => ({
       ...prev,
       theme: { ...prev.theme, [field]: value }
     }));
   };
+
+  const updateCustomColor = (key: 'from' | 'via' | 'to', hue: number) => {
+    const hsl = `hsl(${hue}, 70%, 60%)`;
+    setGiftData((prev) => ({
+      ...prev,
+      theme: {
+        ...prev.theme,
+        customColors: {
+          from: prev.theme.customColors?.from || 'hsl(0,70%,60%)',
+          via: prev.theme.customColors?.via || 'hsl(120,70%,60%)',
+          to: prev.theme.customColors?.to || 'hsl(240,70%,60%)',
+          [key]: hsl
+        }
+      }
+    }));
+  };
+
 
   const updateSecurity = (field: string, value: string) => {
     setGiftData((prev) => ({
@@ -111,6 +163,26 @@ export default function CreatorStudio() {
     setGiftData((prev) => ({
       ...prev,
       finale: { ...prev.finale, [field]: value }
+    }));
+  };
+
+  const updateConfessionField = (field: string, value: any) => {
+    setGiftData((prev) => ({
+      ...prev,
+      confession: {
+        ...(prev.confession || {
+          whispers: [],
+          scrollMessage: '',
+          question: '',
+          yesLabel: '',
+          noLabel: '',
+          certificateTitle: '',
+          certificateBody: '',
+          senderName: '',
+          recipientName: ''
+        }),
+        [field]: value
+      }
     }));
   };
 
@@ -182,6 +254,49 @@ export default function CreatorStudio() {
       alert(`Gagal mengunggah gambar: ${err.message || 'Error tidak diketahui. Pastikan Anda telah membuat bucket storage "gift-images" di dashboard Supabase.'}`);
     } finally {
       setIsUploading((prev) => ({ ...prev, [index]: false }));
+    }
+  };
+
+  const handleMusicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    // Limit size to 10MB for audio
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Ukuran file musik terlalu besar. Maksimal 10MB.');
+      return;
+    }
+
+    setIsMusicUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const fileName = `music_${randomString}_${Date.now()}.${fileExt}`;
+
+      const { error } = await supabase.storage
+        .from('gift-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gift-images')
+        .getPublicUrl(fileName);
+
+      setGiftData((prev) => ({ ...prev, musicUrl: publicUrl }));
+      setUploadedMusicName(file.name);
+    } catch (err: any) {
+      console.error('Music upload error:', err);
+      alert(`Gagal mengunggah musik: ${err.message || 'Error tidak diketahui.'}`);
+    } finally {
+      setIsMusicUploading(false);
     }
   };
 
@@ -285,7 +400,7 @@ export default function CreatorStudio() {
               {/* Palette Selection */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-stone-600">Palette Warna:</label>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-6">
                   {PALETTES.map((p) => (
                     <button
                       key={p.id}
@@ -298,6 +413,113 @@ export default function CreatorStudio() {
                     >
                       <div className={`w-8 h-8 rounded-full ${p.bg} mx-auto mb-2 border border-white shadow-sm`} />
                       <span className="text-xs text-stone-700">{p.name}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Custom Color Palette Customizer inputs */}
+                {giftData.theme.palette === 'custom' && (
+                  <div className="p-4 bg-stone-50 border border-stone-200 rounded-2xl space-y-4 mt-3">
+                    <span className="text-xs font-bold text-stone-500 uppercase tracking-wide block">
+                      Sesuaikan Warna Palet Kustom
+                    </span>
+          <div className="flex gap-2 mb-2">
+            <button
+              type="button"
+              onClick={() => setGiftData((prev) => ({
+                ...prev,
+                theme: {
+                  ...prev.theme,
+                  customColors: { from: '#ffffff', via: '#ffffff', to: '#ffffff' }
+                }
+              }))}
+              className="w-8 h-8 rounded border border-gray-300 bg-white hover:scale-105 transition-transform"
+              title="White"
+            />
+            <button
+              type="button"
+              onClick={() => setGiftData((prev) => ({
+                ...prev,
+                theme: {
+                  ...prev.theme,
+                  customColors: { from: '#000000', via: '#000000', to: '#000000' }
+                }
+              }))}
+              className="w-8 h-8 rounded border border-gray-300 bg-black hover:scale-105 transition-transform"
+              title="Black"
+            />
+          </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10px] text-stone-500 block mb-1">Mulai (Awal)</label>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="range"
+                            min="0"
+                            max="360"
+                            value={(() => { const match = /hsl\((\d+),/.exec(giftData.theme.customColors?.from || 'hsl(0,70%,60%)'); return match ? Number(match[1]) : 0; })()}
+                            onChange={(e) => updateCustomColor('from', Number(e.target.value))}
+                            className="w-full"
+                          />
+                          <div
+                            style={{ backgroundColor: giftData.theme.customColors?.from || '#ffe4e6', width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #ccc' }}
+                          ></div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-stone-500 block mb-1">Tengah (Transisi)</label>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="range"
+                            min="0"
+                            max="360"
+                            value={(() => { const match = /hsl\((\d+),/.exec(giftData.theme.customColors?.via || 'hsl(120,70%,60%)'); return match ? Number(match[1]) : 120; })()}
+                            onChange={(e) => updateCustomColor('via', Number(e.target.value))}
+                            className="w-full"
+                          />
+                          <div
+                            style={{ backgroundColor: giftData.theme.customColors?.via || '#fbcfe8', width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #ccc' }}
+                          ></div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-stone-500 block mb-1">Akhir (Selesai)</label>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="range"
+                            min="0"
+                            max="360"
+                            value={(() => { const match = /hsl\((\d+),/.exec(giftData.theme.customColors?.to || 'hsl(240,70%,60%)'); return match ? Number(match[1]) : 240; })()}
+                            onChange={(e) => updateCustomColor('to', Number(e.target.value))}
+                            className="w-full"
+                          />
+                          <div
+                            style={{ backgroundColor: giftData.theme.customColors?.to || '#f472b6', width: '24px', height: '24px', borderRadius: '4px', border: '1px solid #ccc' }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Animation Selection */}
+              <div className="space-y-3 pt-2">
+                <label className="text-sm font-semibold text-stone-600">Gaya Animasi Pembuka:</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {ANIMATIONS.map((anim) => (
+                    <button
+                      key={anim.id}
+                      onClick={() => updateTheme('flowerStyle', anim.id)}
+                      className={`p-3 rounded-2xl border text-center transition-all ${
+                        giftData.theme.flowerStyle === anim.id
+                          ? 'border-rose-400 ring-2 ring-rose-200 font-semibold bg-white'
+                          : 'border-stone-200 bg-white/50 hover:bg-white hover:border-stone-300'
+                      }`}
+                    >
+                      <div className="text-2xl mb-1">{anim.icon}</div>
+                      <span className="text-xs text-stone-700 block font-semibold">{anim.name}</span>
+                      <span className="text-[10px] text-stone-400 block mt-0.5 leading-tight">{anim.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -333,6 +555,49 @@ export default function CreatorStudio() {
                     className="w-full px-4 py-2 border border-stone-200 rounded-xl bg-white text-xs focus:ring-rose-200 focus:border-rose-400 focus:outline-none"
                     placeholder="https://example.com/song.mp3"
                   />
+                </div>
+                
+                {/* Custom local MP3 uploader */}
+                <div className="pt-2 border-t border-stone-100 mt-2">
+                  <label className="text-xs font-semibold text-stone-500 block mb-1.5">
+                    Atau Unggah File MP3 Dari Perangkat Anda:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="audio/mp3,audio/mpeg"
+                      onChange={handleMusicUpload}
+                      disabled={isMusicUploading}
+                      className="hidden"
+                      id="music-upload-input"
+                    />
+                    <label
+                      htmlFor="music-upload-input"
+                      className={`w-full p-4 rounded-2xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-stone-50 ${
+                        isMusicUploading
+                          ? 'border-stone-200 bg-stone-50 cursor-not-allowed'
+                          : 'border-stone-300 hover:border-rose-400'
+                      }`}
+                    >
+                      {isMusicUploading ? (
+                        <div className="flex items-center gap-2 text-stone-500 text-xs">
+                          <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+                          <span>Sedang mengunggah audio...</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 text-stone-600 text-xs">
+                          <Upload className="w-5 h-5 text-stone-400 mb-0.5" />
+                          <span className="font-semibold text-stone-700">Pilih file audio (.mp3)</span>
+                          <span className="text-[10px] text-stone-400">Maksimal ukuran file 10MB</span>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                  {uploadedMusicName && (
+                    <div className="mt-2 text-xs text-rose-600 font-semibold flex items-center gap-1.5 bg-rose-50/50 p-2 rounded-xl border border-rose-100">
+                      <span className="text-stone-500 font-normal">File aktif:</span> {uploadedMusicName}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -444,133 +709,300 @@ export default function CreatorStudio() {
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-rose-500" /> 4. Isi Surat & Kenangan
                   </h2>
-                  <p className="text-stone-500 text-sm">Tambahkan kartu pesan cinta dan foto slide Anda.</p>
+                  <p className="text-stone-500 text-sm">Tambahkan cerita kenangan atau atur kado pengakuan romantis Anda.</p>
                 </div>
               </div>
 
-              {/* Dynamic Content Builder */}
-              <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
-                {giftData.content.map((item, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-white border border-stone-200 relative group shadow-sm">
-                    <button
-                      onClick={() => removeContentItem(idx)}
-                      disabled={giftData.content.length <= 1}
-                      className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-rose-50 text-stone-400 hover:text-rose-500 transition disabled:opacity-30 disabled:hover:bg-transparent"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+              {/* Template Selection Tabs */}
+              <div className="flex gap-2 bg-stone-100 p-1.5 rounded-2xl border border-stone-200/50">
+                <button
+                  type="button"
+                  onClick={() => setGiftData(prev => ({ ...prev, templateId: 'museum' }))}
+                  className={`flex-1 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+                    (giftData.templateId || 'museum') === 'museum'
+                      ? 'bg-white text-rose-600 shadow-sm'
+                      : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50/50'
+                  }`}
+                >
+                  Museum Slide (Default)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGiftData(prev => ({ ...prev, templateId: 'confession' }))}
+                  className={`flex-1 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+                    giftData.templateId === 'confession'
+                      ? 'bg-white text-rose-600 shadow-sm'
+                      : 'text-stone-500 hover:text-stone-700 hover:bg-stone-50/50'
+                  }`}
+                >
+                  Kartu Pengakuan (Confession)
+                </button>
+              </div>
 
-                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block mb-3">
-                      Kartu {idx + 1} ({item.type === 'text' ? 'Tulisan' : 'Gambar'})
-                    </span>
+              {/* TEMPLATE A: Museum Slide (Default) */}
+              {(giftData.templateId || 'museum') === 'museum' && (
+                <div className="space-y-6">
+                  {/* Dynamic Content Builder */}
+                  <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                    {giftData.content.map((item, idx) => (
+                      <div key={idx} className="p-5 rounded-2xl bg-white border border-stone-200 relative group shadow-sm">
+                        <button
+                          type="button"
+                          onClick={() => removeContentItem(idx)}
+                          disabled={giftData.content.length <= 1}
+                          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-rose-50 text-stone-400 hover:text-rose-500 transition disabled:opacity-30 disabled:hover:bg-transparent"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
 
-                    {item.type === 'text' ? (
-                      <textarea
-                        value={item.body || ''}
-                        onChange={(e) => handleContentChange(idx, 'body', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-2 border border-stone-200 rounded-xl focus:ring-rose-200 focus:border-rose-400 focus:outline-none text-sm"
-                        placeholder="Tulis pesan romantis atau cerita di kartu ini..."
-                      />
-                    ) : (
-                      <div className="space-y-4">
-                        {/* File Upload Area */}
-                        <div>
-                          <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Unggah Foto Kado:</label>
-                          <div className="flex flex-col sm:flex-row items-center gap-4">
-                            
-                            {/* Image Preview / Upload Status Area */}
-                            <div className="w-24 h-24 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0 relative group/preview shadow-inner">
-                              {isUploading[idx] ? (
-                                <Loader2 className="w-6 h-6 text-rose-500 animate-spin" />
-                              ) : item.url ? (
-                                <>
-                                  <img src={item.url} alt="Pratinjau" className="w-full h-full object-cover" />
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleContentChange(idx, 'url', '')}
-                                      className="text-white text-xs font-semibold hover:underline"
-                                    >
-                                      Hapus
-                                    </button>
-                                  </div>
-                                </>
-                              ) : (
-                                <ImageIcon className="w-8 h-8 text-stone-300" />
-                              )}
+                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block mb-3">
+                          Kartu {idx + 1} ({item.type === 'text' ? 'Tulisan' : 'Gambar'})
+                        </span>
+
+                        {item.type === 'text' ? (
+                          <textarea
+                            value={item.body || ''}
+                            onChange={(e) => handleContentChange(idx, 'body', e.target.value)}
+                            rows={3}
+                            className="w-full px-4 py-2 border border-stone-200 rounded-xl focus:ring-rose-200 focus:border-rose-400 focus:outline-none text-sm"
+                            placeholder="Tulis pesan romantis atau cerita di kartu ini..."
+                          />
+                        ) : (
+                          <div className="space-y-4">
+                            {/* File Upload Area */}
+                            <div>
+                              <label className="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Unggah Foto Kado:</label>
+                              <div className="flex flex-col sm:flex-row items-center gap-4">
+                                
+                                {/* Image Preview / Upload Status Area */}
+                                <div className="w-24 h-24 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0 relative group/preview shadow-inner">
+                                  {isUploading[idx] ? (
+                                    <Loader2 className="w-6 h-6 text-rose-500 animate-spin" />
+                                  ) : item.url ? (
+                                    <>
+                                      <img src={item.url} alt="Pratinjau" className="w-full h-full object-cover" />
+                                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleContentChange(idx, 'url', '')}
+                                          className="text-white text-xs font-semibold hover:underline"
+                                        >
+                                          Hapus
+                                        </button>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <ImageIcon className="w-8 h-8 text-stone-300" />
+                                  )}
+                                </div>
+
+                                {/* Upload Button & Dropzone */}
+                                <div className="flex-1 w-full">
+                                  <label className={`w-full py-4 px-6 border border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all ${
+                                    isUploading[idx] 
+                                      ? 'border-rose-200 bg-rose-50/10 pointer-events-none' 
+                                      : 'border-stone-200 hover:border-rose-300 hover:bg-rose-50/10'
+                                  }`}>
+                                    <Upload className={`w-5 h-5 mb-1 ${isUploading[idx] ? 'text-rose-400 animate-pulse' : 'text-stone-400'}`} />
+                                    <span className="text-xs font-semibold text-stone-600">
+                                      {isUploading[idx] ? 'Mengunggah...' : 'Pilih file gambar'}
+                                    </span>
+                                    <span className="text-[9px] text-stone-400 mt-0.5">JPG, PNG, GIF up to 5MB</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => handleImageUpload(idx, e)}
+                                      className="hidden"
+                                      disabled={isUploading[idx]}
+                                    />
+                                  </label>
+                                </div>
+                              </div>
                             </div>
 
-                            {/* Upload Button & Dropzone */}
-                            <div className="flex-1 w-full">
-                              <label className={`w-full py-4 px-6 border border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                                isUploading[idx] 
-                                  ? 'border-rose-200 bg-rose-50/10 pointer-events-none' 
-                                  : 'border-stone-200 hover:border-rose-300 hover:bg-rose-50/10'
-                              }`}>
-                                <Upload className={`w-5 h-5 mb-1 ${isUploading[idx] ? 'text-rose-400 animate-pulse' : 'text-stone-400'}`} />
-                                <span className="text-xs font-semibold text-stone-600">
-                                  {isUploading[idx] ? 'Mengunggah...' : 'Pilih file gambar'}
-                                </span>
-                                <span className="text-[9px] text-stone-400 mt-0.5">JPG, PNG, GIF up to 5MB</span>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => handleImageUpload(idx, e)}
-                                  className="hidden"
-                                  disabled={isUploading[idx]}
-                                />
+                            {/* URL Fallback Input (Manual) */}
+                            <div className="border-t border-stone-100 pt-3">
+                              <label className="text-[9px] font-semibold text-stone-400 block mb-1">
+                                Atau tempelkan URL gambar manual (opsional):
                               </label>
+                              <input
+                                type="text"
+                                value={item.url || ''}
+                                onChange={(e) => handleContentChange(idx, 'url', e.target.value)}
+                                className="w-full px-3 py-1.5 border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-300 text-xs bg-stone-50/50"
+                                placeholder="https://example.com/foto.jpg"
+                              />
+                            </div>
+
+                            {/* Caption Field */}
+                            <div>
+                              <label className="text-[10px] font-semibold text-stone-500 block mb-1">Keterangan Gambar (Caption):</label>
+                              <input
+                                type="text"
+                                value={item.caption || ''}
+                                onChange={(e) => handleContentChange(idx, 'caption', e.target.value)}
+                                className="w-full px-3 py-1.5 border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-300 text-xs"
+                                placeholder="Keterangan singkat..."
+                              />
                             </div>
                           </div>
-                        </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
 
-                        {/* URL Fallback Input (Manual) */}
-                        <div className="border-t border-stone-100 pt-3">
-                          <label className="text-[9px] font-semibold text-stone-400 block mb-1">
-                            Atau tempelkan URL gambar manual (opsional):
-                          </label>
-                          <input
-                            type="text"
-                            value={item.url || ''}
-                            onChange={(e) => handleContentChange(idx, 'url', e.target.value)}
-                            className="w-full px-3 py-1.5 border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-300 text-xs bg-stone-50/50"
-                            placeholder="https://example.com/foto.jpg"
+                  {/* Add item buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => addContentItem('text')}
+                      className="flex-1 py-3 border border-dashed border-rose-300 hover:border-rose-400 text-rose-500 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-semibold hover:bg-rose-50/30 transition"
+                    >
+                      <Plus className="w-4 h-4" /> Tambah Kartu Tulisan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => addContentItem('image')}
+                      className="flex-1 py-3 border border-dashed border-rose-300 hover:border-rose-400 text-rose-500 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-semibold hover:bg-rose-50/30 transition"
+                    >
+                      <Plus className="w-4 h-4" /> Tambah Kartu Gambar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TEMPLATE B: Kartu Pengakuan (Confession) */}
+              {giftData.templateId === 'confession' && (
+                <div className="space-y-6 max-h-[500px] overflow-y-auto pr-1">
+                  
+                  {/* Sender & Recipient names */}
+                  <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
+                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Identitas Sertifikat</span>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Nama Pengirim (Sender):</label>
+                        <input
+                          type="text"
+                          value={giftData.confession?.senderName || ''}
+                          onChange={(e) => updateConfessionField('senderName', e.target.value)}
+                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none focus:ring-rose-200 focus:border-rose-400 text-xs font-medium"
+                          placeholder="e.g. Raka"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Nama Penerima (Recipient):</label>
+                        <input
+                          type="text"
+                          value={giftData.confession?.recipientName || ''}
+                          onChange={(e) => updateConfessionField('recipientName', e.target.value)}
+                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none focus:ring-rose-200 focus:border-rose-400 text-xs font-medium"
+                          placeholder="e.g. Nara"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Whisper Cards */}
+                  <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
+                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Kartu Bisik-Bisik (Urutan 1 - 5)</span>
+                    <div className="space-y-3">
+                      {Array.from({ length: 5 }).map((_, idx) => (
+                        <div key={idx} className="flex gap-3 items-start">
+                          <span className="text-[10px] font-bold text-stone-400 bg-stone-100 w-5 h-5 rounded-full flex items-center justify-center mt-2 flex-shrink-0">{idx + 1}</span>
+                          <textarea
+                            value={giftData.confession?.whispers?.[idx] || ''}
+                            onChange={(e) => {
+                              const newWhispers = [...(giftData.confession?.whispers || [])];
+                              newWhispers[idx] = e.target.value;
+                              updateConfessionField('whispers', newWhispers);
+                            }}
+                            rows={2}
+                            className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none focus:ring-rose-200 focus:border-rose-400 text-xs"
+                            placeholder={`Tulis bisikan ke-${idx + 1}...`}
                           />
                         </div>
+                      ))}
+                    </div>
+                  </div>
 
-                        {/* Caption Field */}
+                  {/* Scroll Message */}
+                  <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-3">
+                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Isi Surat Utama (Gulungan Naskah)</span>
+                    <textarea
+                      value={giftData.confession?.scrollMessage || ''}
+                      onChange={(e) => updateConfessionField('scrollMessage', e.target.value)}
+                      rows={5}
+                      className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:outline-none focus:ring-rose-200 focus:border-rose-400 text-xs"
+                      placeholder="Tulis surat rahasiamu di sini..."
+                    />
+                  </div>
+
+                  {/* Proposal Question & Action buttons */}
+                  <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
+                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Pertanyaan & Pilihan Jawaban</span>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Pertanyaan Utama:</label>
+                        <input
+                          type="text"
+                          value={giftData.confession?.question || ''}
+                          onChange={(e) => updateConfessionField('question', e.target.value)}
+                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none text-xs font-medium"
+                          placeholder="e.g. Mau jadi pacarku?"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="text-[10px] font-semibold text-stone-500 block mb-1">Keterangan Gambar (Caption):</label>
+                          <label className="text-[10px] font-semibold text-stone-500 block mb-1">Teks Setuju (Yes):</label>
                           <input
                             type="text"
-                            value={item.caption || ''}
-                            onChange={(e) => handleContentChange(idx, 'caption', e.target.value)}
-                            className="w-full px-3 py-1.5 border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-300 text-xs"
-                            placeholder="Keterangan singkat..."
+                            value={giftData.confession?.yesLabel || ''}
+                            onChange={(e) => updateConfessionField('yesLabel', e.target.value)}
+                            className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none text-xs font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-semibold text-stone-500 block mb-1">Teks Mikir (No):</label>
+                          <input
+                            type="text"
+                            value={giftData.confession?.noLabel || ''}
+                            onChange={(e) => updateConfessionField('noLabel', e.target.value)}
+                            className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none text-xs font-semibold"
                           />
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Add item buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => addContentItem('text')}
-                  className="flex-1 py-3 border border-dashed border-rose-300 hover:border-rose-400 text-rose-500 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-semibold hover:bg-rose-50/30 transition"
-                >
-                  <Plus className="w-4 h-4" /> Tambah Kartu Tulisan
-                </button>
-                <button
-                  onClick={() => addContentItem('image')}
-                  className="flex-1 py-3 border border-dashed border-rose-300 hover:border-rose-400 text-rose-500 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-semibold hover:bg-rose-50/30 transition"
-                >
-                  <Plus className="w-4 h-4" /> Tambah Kartu Gambar
-                </button>
-              </div>
+                  {/* Certificate Customize */}
+                  <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
+                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Desain Sertifikat Resmi</span>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Judul Dokumen:</label>
+                        <input
+                          type="text"
+                          value={giftData.confession?.certificateTitle || ''}
+                          onChange={(e) => updateConfessionField('certificateTitle', e.target.value)}
+                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none text-xs font-bold"
+                          placeholder="e.g. Sertifikat Jadi Kita"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Isi Surat Pernyataan:</label>
+                        <textarea
+                          value={giftData.confession?.certificateBody || ''}
+                          onChange={(e) => updateConfessionField('certificateBody', e.target.value)}
+                          rows={3}
+                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none text-xs"
+                          placeholder="Deklarasi resmi hubungan..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
 
               {/* Finale message input */}
               <div className="p-5 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-2 mt-4">
@@ -719,7 +1151,12 @@ export default function CreatorStudio() {
 
           {/* Screen area inside phone */}
           <div className="w-full h-full bg-white relative overflow-hidden rounded-[36px]">
-            <GiftViewer key={previewKey} giftData={giftData} />
+            <GiftViewer 
+              key={`${previewKey}-${currentStep}-${giftData.theme.flowerStyle}-${giftData.theme.palette}`} 
+              giftData={giftData} 
+              isPreview={true} 
+              activeStep={currentStep}
+            />
           </div>
         </div>
       </div>

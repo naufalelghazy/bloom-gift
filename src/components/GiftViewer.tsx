@@ -7,17 +7,37 @@ import LockedStage from './stages/LockedStage';
 import IntroStage from './stages/IntroStage';
 import StoryStage from './stages/StoryStage';
 import FinaleStage from './stages/FinaleStage';
+import ConfessionStage from './stages/ConfessionStage';
 
 interface GiftViewerProps {
   giftData: GiftData;
+  isPreview?: boolean;
+  activeStep?: number;
 }
 
 type Stage = 'LOCKED' | 'INTRO' | 'STORY' | 'FINALE';
 
-export default function GiftViewer({ giftData }: GiftViewerProps) {
-  const [stage, setStage] = useState<Stage>(
-    giftData.security.gateType === 'none' ? 'INTRO' : 'LOCKED'
-  );
+export default function GiftViewer({ giftData, isPreview = false, activeStep = 1 }: GiftViewerProps) {
+  const getInitialStage = () => {
+    if (!isPreview) {
+      return giftData.security.gateType === 'none' ? 'INTRO' : 'LOCKED';
+    }
+    switch (activeStep) {
+      case 1:
+      case 3:
+        return 'INTRO';
+      case 2:
+        return giftData.security.gateType === 'none' ? 'INTRO' : 'LOCKED';
+      case 4:
+        return 'STORY';
+      case 5:
+        return 'FINALE';
+      default:
+        return 'INTRO';
+    }
+  };
+
+  const [stage, setStage] = useState<Stage>(getInitialStage());
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -27,10 +47,17 @@ export default function GiftViewer({ giftData }: GiftViewerProps) {
     blue: 'from-sky-50 via-indigo-50/40 to-blue-100/50',
     yellow: 'from-amber-50 via-orange-50/40 to-yellow-100/50',
     white: 'from-stone-50 via-stone-100/30 to-stone-200/40',
-    mixed: 'from-pink-50 via-indigo-50/30 to-amber-50/50',
+    mixed: 'from-pink-50 via-indigo-50/30 to-amber-50/50'
   };
 
-  const currentGradient = backgroundGradients[giftData.theme.palette] || backgroundGradients.pink;
+  const isCustom = giftData.theme.palette === 'custom' && giftData.theme.customColors;
+  const gradientClass = !isCustom ? backgroundGradients[giftData.theme.palette] || backgroundGradients.pink : '';
+  const customStyle = isCustom ? {
+    background: `linear-gradient(to top right, ${giftData.theme.customColors?.from}, ${giftData.theme.customColors?.via || ''}, ${giftData.theme.customColors?.to})`
+  } : {};
+
+  const containerClassName = `${isPreview ? 'h-full' : 'min-h-screen'} w-full flex flex-col items-center justify-center p-4 overflow-hidden relative font-sans ${!isCustom ? `bg-gradient-to-tr ${gradientClass}` : ''}`;
+
 
   const playMusic = () => {
     if (audioRef.current) {
@@ -64,7 +91,7 @@ export default function GiftViewer({ giftData }: GiftViewerProps) {
   }, [giftData.security.gateType, stage]);
 
   return (
-    <div className={`min-h-screen w-full bg-gradient-to-tr ${currentGradient} flex flex-col items-center justify-center p-4 overflow-hidden relative font-sans`}>
+    <div className={containerClassName} style={customStyle}>
       <audio
         ref={audioRef}
         src={giftData.musicUrl}
@@ -101,7 +128,11 @@ export default function GiftViewer({ giftData }: GiftViewerProps) {
             transition={{ duration: 0.5 }}
             className="w-full flex justify-center z-10"
           >
-            <IntroStage intro={giftData.intro} onComplete={() => setStage('STORY')} />
+            <IntroStage 
+              intro={giftData.intro} 
+              flowerStyle={giftData.theme.flowerStyle} 
+              onComplete={() => setStage('STORY')} 
+            />
           </motion.div>
         )}
 
@@ -114,13 +145,22 @@ export default function GiftViewer({ giftData }: GiftViewerProps) {
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className="w-full flex justify-center z-10"
           >
-            <StoryStage
-              content={giftData.content}
-              musicUrl={giftData.musicUrl}
-              isMuted={isMuted}
-              onToggleMute={handleToggleMute}
-              onComplete={() => setStage('FINALE')}
-            />
+            {giftData.templateId === 'confession' ? (
+              <ConfessionStage
+                confession={giftData.confession}
+                senderName={giftData.confession?.senderName}
+                recipientName={giftData.confession?.recipientName}
+                onComplete={() => setStage('FINALE')}
+              />
+            ) : (
+              <StoryStage
+                content={giftData.content}
+                musicUrl={giftData.musicUrl}
+                isMuted={isMuted}
+                onToggleMute={handleToggleMute}
+                onComplete={() => setStage('FINALE')}
+              />
+            )}
           </motion.div>
         )}
 
