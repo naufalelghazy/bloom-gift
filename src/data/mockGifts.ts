@@ -14,12 +14,14 @@ export interface GiftTheme {
   };
   flowerStyle: string;
   fontFamily: string;
+  cardStyle?: string;
 }
 
 export interface GiftSecurity {
   gateType: 'pin' | 'question' | 'none';
   passcode?: string;
   hint?: string;
+  question?: string;
 }
 
 export interface ConfessionConfig {
@@ -62,7 +64,8 @@ export const mockGifts: Record<string, GiftData> = {
     theme: {
       palette: 'pink',
       flowerStyle: 'rose',
-      fontFamily: 'font-serif'
+      fontFamily: 'font-serif',
+      cardStyle: 'lined'
     },
     templateId: 'museum',
     security: {

@@ -12,7 +12,7 @@ interface ConfessionStageProps {
   onComplete: () => void;
 }
 
-type Substage = 
+type Substage =
   | 'WAX_SEAL'
   | 'WHISPERS'
   | 'SCROLL'
@@ -36,24 +36,24 @@ const DEFAULT_CONFESSION: ConfessionConfig = {
   certificateBody: "Dengan ini kita resmi boleh saling bikin salting, saling kabarin, dan pelan-pelan punya cerita yang cuma kita yang paham. Dari Aku, buat Kamu."
 };
 
-export default function ConfessionStage({ 
-  confession = DEFAULT_CONFESSION, 
+export default function ConfessionStage({
+  confession = DEFAULT_CONFESSION,
   senderName = "Aku",
   recipientName = "Kamu",
-  onComplete 
+  onComplete
 }: ConfessionStageProps) {
   const [substage, setSubstage] = useState<Substage>('WAX_SEAL');
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
-  
+
   // Whisper cards state
   const [whisperIdx, setWhisperIdx] = useState(0);
-  
+
   // Scroll unroll state
   const [isScrollOpen, setIsScrollOpen] = useState(false);
-  
+
   // Decision state
   const [noClicks, setNoClicks] = useState(0);
-  
+
   // Scanner state
   const [scanProgress, setScanProgress] = useState(0);
   const [scanStatus, setScanStatus] = useState('TAP_TO_SCAN'); // TAP_TO_SCAN, SCANNING, SUCCESS
@@ -142,7 +142,7 @@ export default function ConfessionStage({
           background-position: 0 16px;
         }
       `}</style>
-      
+
       {substage === 'WAX_SEAL' && (
         <motion.div
           key="wax-seal"
@@ -163,10 +163,10 @@ export default function ConfessionStage({
 
           {/* Envelope Main Container */}
           <div className="relative w-[240px] h-[160px] flex items-center justify-center select-none my-4">
-            
+
             {/* 1. Envelope Back Pocket */}
             <div className="absolute inset-0 bg-[#f8eff0] border border-[#eadae0] rounded-xl shadow-md overflow-hidden z-0" />
-            
+
             {/* 2. Sliding Card (Starts hidden in pocket, slides up) */}
             <motion.div
               initial={{ y: 8, opacity: 0, scale: 0.95 }}
@@ -190,8 +190,8 @@ export default function ConfessionStage({
               animate={{ zIndex: isEnvelopeOpen ? 5 : 25 }}
               transition={{ delay: isEnvelopeOpen ? 0.6 : 0 }}
             >
-              <svg 
-                className="w-full h-full overflow-visible drop-shadow-sm" 
+              <svg
+                className="w-full h-full overflow-visible drop-shadow-sm"
                 viewBox="0 0 240 160"
                 style={{ clipPath: isEnvelopeOpen ? "none" : "inset(0px round 12px)" }}
               >
@@ -207,8 +207,8 @@ export default function ConfessionStage({
 
             {/* 4. Envelope Front Bottom Flaps (Left, Right, Center) */}
             <div className="absolute inset-0 w-full h-full pointer-events-none z-20">
-              <svg 
-                className="w-full h-full drop-shadow-sm" 
+              <svg
+                className="w-full h-full drop-shadow-sm"
                 viewBox="0 0 240 160"
                 style={{ clipPath: "inset(0px round 12px)" }}
               >
@@ -243,7 +243,7 @@ export default function ConfessionStage({
                 border: '1px solid #d48f99'
               }}
             >
-              <div 
+              <div
                 className="w-[72%] h-[72%] flex items-center justify-center"
                 style={{
                   borderRadius: '50% 48% 52% 48% / 48% 52% 48% 52%',
@@ -353,10 +353,10 @@ export default function ConfessionStage({
         >
           {/* Scroll Container */}
           <div className="relative flex flex-col items-center justify-center">
-            
+
             {/* Scroll Body Wrapper */}
             <motion.div
-              animate={{ 
+              animate={{
                 height: isScrollOpen ? 380 : 80,
                 width: 290
               }}
@@ -366,7 +366,7 @@ export default function ConfessionStage({
             >
               {/* Paper Background between the rolls */}
               <motion.div
-                animate={{ 
+                animate={{
                   height: isScrollOpen ? 356 : 56
                 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -374,7 +374,7 @@ export default function ConfessionStage({
               >
                 {/* Lined paper visual wrapper */}
                 <div className="w-full h-full p-4 relative flex flex-col justify-between">
-                  
+
                   {/* Floral Deco Bottom-Right (shows when open) */}
                   {isScrollOpen && (
                     <div className="absolute bottom-0 right-0 w-24 h-24 pointer-events-none opacity-45 select-none z-0">
@@ -406,7 +406,7 @@ export default function ConfessionStage({
                           border: '1.2px solid #d48f99'
                         }}
                       >
-                        <div 
+                        <div
                           className="w-[70%] h-[70%] flex items-center justify-center"
                           style={{
                             borderRadius: '50% 48% 52% 48% / 48% 52% 48% 52%',
@@ -464,7 +464,7 @@ export default function ConfessionStage({
               </motion.div>
 
               {/* 3D Top Cylinder Roll */}
-              <div 
+              <div
                 className="absolute top-0 left-0 right-0 h-[24px] z-20 flex items-center justify-between"
                 style={{
                   borderRadius: '12px',
@@ -478,8 +478,8 @@ export default function ConfessionStage({
               </div>
 
               {/* 3D Bottom Cylinder Roll */}
-              <motion.div 
-                animate={{ 
+              <motion.div
+                animate={{
                   top: isScrollOpen ? 356 : 56
                 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -623,7 +623,7 @@ export default function ConfessionStage({
           <div className="w-[220px] h-[220px] p-3.5 bg-[#fdfbf8] border border-[#eadae0] rounded-[36px] shadow-lg flex items-center justify-center relative my-2">
             {/* Inner Red Screen */}
             <div className="w-full h-full rounded-[24px] bg-gradient-to-br from-[#c82236] to-[#700c19] relative flex flex-col items-center justify-between py-6 px-4 overflow-hidden shadow-inner">
-              
+
               {/* Laser light line (animating top to bottom during scan) */}
               {scanStatus === 'SCANNING' && (
                 <motion.div
@@ -635,10 +635,10 @@ export default function ConfessionStage({
               )}
 
               {/* Ornate 3D Heart Wax Seal */}
-              <svg 
-                width="104" 
-                height="96" 
-                viewBox="0 0 120 110" 
+              <svg
+                width="104"
+                height="96"
+                viewBox="0 0 120 110"
                 className="drop-shadow-md z-10 transition-transform active:scale-95 cursor-pointer mt-1"
                 onClick={scanStatus === 'TAP_TO_SCAN' ? handleStartScan : undefined}
               >
@@ -656,17 +656,17 @@ export default function ConfessionStage({
                   </radialGradient>
                 </defs>
                 {/* Outer Wax Heart base */}
-                <path 
-                  d="M60,15 C40,-10 0,5 0,45 C0,80 60,110 60,110 C60,110 120,80 120,45 C120,5 80,-10 60,15 Z" 
-                  fill="url(#heartOuterGrad)" 
+                <path
+                  d="M60,15 C40,-10 0,5 0,45 C0,80 60,110 60,110 C60,110 120,80 120,45 C120,5 80,-10 60,15 Z"
+                  fill="url(#heartOuterGrad)"
                 />
                 {/* Ornate Leaf swirls on the left/right borders */}
                 <path d="M 22 45 C 22 30, 48 30, 48 45 C 48 55, 60 65, 60 75" fill="none" stroke="#f2d2d6" strokeWidth="2.5" strokeLinecap="round" opacity="0.85" />
                 <path d="M 98 45 C 98 30, 72 30, 72 45 C 72 55, 60 65, 60 75" fill="none" stroke="#f2d2d6" strokeWidth="2.5" strokeLinecap="round" opacity="0.85" />
                 {/* Inner Heart stamp shape */}
-                <path 
-                  d="M60,25 C45,5 15,18 15,50 C15,78 60,100 60,100 C60,100 105,78 105,50 C105,18 75,5 60,25 Z" 
-                  fill="url(#heartInnerGrad)" 
+                <path
+                  d="M60,25 C45,5 15,18 15,50 C15,78 60,100 60,100 C60,100 105,78 105,50 C105,18 75,5 60,25 Z"
+                  fill="url(#heartInnerGrad)"
                 />
               </svg>
 
@@ -733,7 +733,7 @@ export default function ConfessionStage({
                 <circle cx="15" cy="12" r="7" fill="#e5abb3" transform="translate(0, 64)" />
                 <circle cx="12" cy="20" r="8" fill="#db9ba3" transform="translate(0, 64)" />
                 <circle cx="18" cy="17" r="3" fill="#fff" transform="translate(0, 64)" />
-                
+
                 <circle cx="42" cy="48" r="5" fill="#db9ba3" transform="translate(-10, 30)" />
                 <circle cx="50" cy="55" r="3.5" fill="#e5abb3" transform="translate(-10, 30)" />
               </svg>
@@ -769,7 +769,7 @@ export default function ConfessionStage({
                     <feGaussianBlur in="displaced" stdDeviation="0.4" />
                   </filter>
                 </defs>
-                
+
                 {/* Stamp Group with Filter applied */}
                 <g filter="url(#inkStampFilter)" fill="none" stroke="#d66874" strokeWidth="2" opacity="0.8">
                   {/* Outer rough circular border */}
@@ -778,23 +778,23 @@ export default function ConfessionStage({
                   <circle cx="50" cy="50" r="38" strokeWidth="1" />
                   {/* Inner decorative dotted ring */}
                   <circle cx="50" cy="50" r="34" strokeWidth="1.2" strokeDasharray="3 3" />
-                  
+
                   {/* Ornate Heart in Center */}
-                  <path 
-                    d="M 50 34 C 44 22, 25 28, 25 44 C 25 58, 50 72, 50 72 C 50 72, 75 58, 75 44 C 75 28, 56 22, 50 34 Z" 
+                  <path
+                    d="M 50 34 C 44 22, 25 28, 25 44 C 25 58, 50 72, 50 72 C 50 72, 75 58, 75 44 C 75 28, 56 22, 50 34 Z"
                     strokeWidth="2.5"
                   />
-                  
+
                   {/* Sprouting plant/flourish inside the heart */}
                   <path d="M 50 70 L 50 56" strokeWidth="2" />
                   <path d="M 50 56 C 45 52, 40 45, 45 38" strokeWidth="1.8" strokeLinecap="round" />
                   <path d="M 50 56 C 55 52, 60 45, 55 38" strokeWidth="1.8" strokeLinecap="round" />
                   <path d="M 50 56 C 47 48, 53 48, 50 38" strokeWidth="1.5" strokeLinecap="round" />
-                  
+
                   {/* Ornate leaves outside the heart (left and right) */}
                   <path d="M 24 54 C 20 62, 32 68, 40 68" strokeWidth="1.5" strokeLinecap="round" />
                   <path d="M 76 54 C 80 62, 68 68, 60 68" strokeWidth="1.5" strokeLinecap="round" />
-                  
+
                   {/* Tiny stars or dots inside stamp */}
                   <circle cx="28" cy="32" r="1" fill="#d66874" stroke="none" />
                   <circle cx="72" cy="32" r="1" fill="#d66874" stroke="none" />
@@ -808,7 +808,7 @@ export default function ConfessionStage({
                   const idx = text.toLowerCase().indexOf("dari");
                   if (idx !== -1) {
                     let footer = text.substring(idx).trim();
-                    
+
                     // Remove "screenshot..." instruction from footer text to avoid double styling
                     const ssIdx = footer.toLowerCase().indexOf("screenshot");
                     if (ssIdx !== -1) {

@@ -49,6 +49,14 @@ const ANIMATIONS = [
   { id: 'envelope', name: 'Amplop Kerajaan', desc: 'Buka surat dengan segel lilin merah', icon: '✉️' }
 ];
 
+const CARD_THEMES = [
+  { id: 'lined', name: 'Buku Catatan', desc: 'Bergaris manis dengan mawar', icon: '📝' },
+  { id: 'parchment', name: 'Kertas Klasik', desc: 'Vintage dengan daun emas', icon: '📜' },
+  { id: 'midnight', name: 'Galaksi Malam', desc: 'Indigo dengan bintang', icon: '🌌' },
+  { id: 'sakura', name: 'Musim Sakura', desc: 'Pink dengan bunga sakura', icon: '🌸' },
+  { id: 'eucalyptus', name: 'Sage Minimalis', desc: 'Tenang dengan eucalyptus', icon: '🌿' }
+];
+
 export default function CreatorStudio() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
@@ -70,6 +78,7 @@ export default function CreatorStudio() {
       palette: 'pink',
       flowerStyle: 'rose',
       fontFamily: 'font-serif',
+      cardStyle: 'lined',
       customColors: {
         from: '#ffe4e6',
         via: '#fbcfe8',
@@ -359,7 +368,7 @@ export default function CreatorStudio() {
 
     setIsSubmitting(false);
     setIsPublished(true);
-    setCurrentStep(5);
+    setCurrentStep(6);
   };
 
   // Refresh dynamic preview on phone mock
@@ -380,7 +389,7 @@ export default function CreatorStudio() {
             <p className="text-stone-500 text-xs mt-1">Rangkai hadiah digital kejutanmu</p>
           </div>
           <span className="text-xs font-semibold px-3 py-1 bg-rose-100 text-rose-600 rounded-full">
-            Langkah {currentStep} dari 5
+            Langkah {currentStep} dari 6
           </span>
         </div>
 
@@ -637,6 +646,20 @@ export default function CreatorStudio() {
               {/* Security Fields */}
               {giftData.security.gateType !== 'none' && (
                 <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
+                  {giftData.security.gateType === 'question' && (
+                    <div>
+                      <label className="text-xs font-semibold text-stone-600 block mb-1">
+                        Teks Pertanyaan (yang akan dilihat penerima):
+                      </label>
+                      <input
+                        type="text"
+                        value={giftData.security.question || ''}
+                        onChange={(e) => updateSecurity('question', e.target.value)}
+                        className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-rose-200 focus:border-rose-400 focus:outline-none text-sm"
+                        placeholder="e.g. Apa nama restoran pertama kita?"
+                      />
+                    </div>
+                  )}
                   <div>
                     <label className="text-xs font-semibold text-stone-600 block mb-1">
                       {giftData.security.gateType === 'pin' ? 'Masukkan PIN Keamanan (Angka/Huruf):' : 'Jawaban Rahasia (Sensitif Huruf Kapital):'}
@@ -742,6 +765,31 @@ export default function CreatorStudio() {
               {/* TEMPLATE A: Museum Slide (Default) */}
               {(giftData.templateId || 'museum') === 'museum' && (
                 <div className="space-y-6">
+                  {/* Card Style Selection */}
+                  <div className="space-y-3 p-4 bg-stone-50 border border-stone-200 rounded-2xl">
+                    <label className="text-xs font-bold text-stone-600 uppercase tracking-wide block">
+                      Gaya Kartu Slide:
+                    </label>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                      {CARD_THEMES.map((theme) => (
+                        <button
+                          key={theme.id}
+                          type="button"
+                          onClick={() => updateTheme('cardStyle', theme.id)}
+                          className={`p-3 rounded-2xl border text-center transition-all ${
+                            (giftData.theme.cardStyle || 'lined') === theme.id
+                              ? 'border-rose-400 ring-2 ring-rose-200 font-semibold bg-white'
+                              : 'border-stone-200 bg-white hover:bg-stone-50 hover:border-stone-300'
+                          }`}
+                        >
+                          <div className="text-xl mb-1">{theme.icon}</div>
+                          <span className="text-xs text-stone-700 block font-semibold leading-tight">{theme.name}</span>
+                          <span className="text-[9px] text-stone-400 block mt-0.5 leading-tight">{theme.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Dynamic Content Builder */}
                   <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
                     {giftData.content.map((item, idx) => (
@@ -875,32 +923,6 @@ export default function CreatorStudio() {
               {giftData.templateId === 'confession' && (
                 <div className="space-y-6 max-h-[500px] overflow-y-auto pr-1">
                   
-                  {/* Sender & Recipient names */}
-                  <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
-                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Identitas Sertifikat</span>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Nama Pengirim (Sender):</label>
-                        <input
-                          type="text"
-                          value={giftData.confession?.senderName || ''}
-                          onChange={(e) => updateConfessionField('senderName', e.target.value)}
-                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none focus:ring-rose-200 focus:border-rose-400 text-xs font-medium"
-                          placeholder="e.g. Raka"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-semibold text-stone-500 block mb-1">Nama Penerima (Recipient):</label>
-                        <input
-                          type="text"
-                          value={giftData.confession?.recipientName || ''}
-                          onChange={(e) => updateConfessionField('recipientName', e.target.value)}
-                          className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none focus:ring-rose-200 focus:border-rose-400 text-xs font-medium"
-                          placeholder="e.g. Nara"
-                        />
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Whisper Cards */}
                   <div className="p-5 rounded-2xl bg-white border border-stone-200 space-y-4">
@@ -991,12 +1013,67 @@ export default function CreatorStudio() {
                       <div>
                         <label className="text-[10px] font-semibold text-stone-500 block mb-1">Isi Surat Pernyataan:</label>
                         <textarea
-                          value={giftData.confession?.certificateBody || ''}
-                          onChange={(e) => updateConfessionField('certificateBody', e.target.value)}
+                          value={(() => {
+                            const text = giftData.confession?.certificateBody || '';
+                            const idx = text.toLowerCase().indexOf('dari');
+                            return idx !== -1 ? text.substring(0, idx).trim() : text;
+                          })()}
+                          onChange={(e) => {
+                            const sender = giftData.confession?.senderName || 'Aku';
+                            const recipient = giftData.confession?.recipientName || 'Kamu';
+                            const signature = ` Dari ${sender}, buat ${recipient}.`;
+                            updateConfessionField('certificateBody', e.target.value + signature);
+                          }}
                           rows={3}
                           className="w-full px-3.5 py-2 border border-stone-200 rounded-xl focus:outline-none text-xs"
                           placeholder="Deklarasi resmi hubungan..."
                         />
+                      </div>
+
+                      {/* Tanda Tangan: Dari...buat... */}
+                      <div className="p-3.5 rounded-xl bg-rose-50/60 border border-rose-100 space-y-2">
+                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-widest block">Tanda Tangan Sertifikat</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] font-semibold text-stone-500 block mb-1">Dari (Pengirim):</label>
+                            <input
+                              type="text"
+                              value={giftData.confession?.senderName || ''}
+                              onChange={(e) => {
+                                updateConfessionField('senderName', e.target.value);
+                                // rebuild certificateBody with new sender
+                                const text = giftData.confession?.certificateBody || '';
+                                const idx = text.toLowerCase().indexOf('dari');
+                                const body = idx !== -1 ? text.substring(0, idx).trim() : text;
+                                const recipient = giftData.confession?.recipientName || 'Kamu';
+                                updateConfessionField('certificateBody', `${body} Dari ${e.target.value}, buat ${recipient}.`);
+                              }}
+                              className="w-full px-3 py-1.5 border border-stone-200 rounded-lg focus:outline-none text-xs font-medium"
+                              placeholder="e.g. Raka"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-semibold text-stone-500 block mb-1">Buat (Penerima):</label>
+                            <input
+                              type="text"
+                              value={giftData.confession?.recipientName || ''}
+                              onChange={(e) => {
+                                updateConfessionField('recipientName', e.target.value);
+                                // rebuild certificateBody with new recipient
+                                const text = giftData.confession?.certificateBody || '';
+                                const idx = text.toLowerCase().indexOf('dari');
+                                const body = idx !== -1 ? text.substring(0, idx).trim() : text;
+                                const sender = giftData.confession?.senderName || 'Aku';
+                                updateConfessionField('certificateBody', `${body} Dari ${sender}, buat ${e.target.value}.`);
+                              }}
+                              className="w-full px-3 py-1.5 border border-stone-200 rounded-lg focus:outline-none text-xs font-medium"
+                              placeholder="e.g. Nara"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-stone-400 italic">
+                          Preview: <span className="text-rose-500 font-medium">Dari {giftData.confession?.senderName || 'Aku'}, buat {giftData.confession?.recipientName || 'Kamu'}.</span>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1004,10 +1081,109 @@ export default function CreatorStudio() {
                 </div>
               )}
 
-              {/* Finale message input */}
-              <div className="p-5 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-2 mt-4">
+
+            </motion.div>
+          )}
+
+          {/* STEP 5: Pilih Bouquet */}
+          {currentStep === 5 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  🌸 5. Pilih Bouquet Akhir
+                </h2>
+                <p className="text-stone-500 text-sm">Pilih buket bunga yang akan muncul di tampilan akhir kado sebagai penutup.</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  {
+                    id: 'pink_roses',
+                    emoji: '🌸',
+                    name: 'Mawar Pink',
+                    meaning: 'Kasih sayang lembut, kekaguman, dan ketulusan hati yang dalam.',
+                    color: 'rose'
+                  },
+                  {
+                    id: 'red_roses',
+                    emoji: '🌹',
+                    name: 'Mawar Merah',
+                    meaning: 'Cinta yang membara, passion, dan komitmen yang tak tergoyahkan.',
+                    color: 'red'
+                  },
+                  {
+                    id: 'tulips',
+                    emoji: '🌷',
+                    name: 'Tulip',
+                    meaning: 'Cinta yang sempurna, keanggunan, dan kesetiaan abadi.',
+                    color: 'pink'
+                  },
+                  {
+                    id: 'sunflowers',
+                    emoji: '🌻',
+                    name: 'Bunga Matahari',
+                    meaning: 'Kebahagiaan, kehangatan, dan loyalitas — selalu memandang terang.',
+                    color: 'amber'
+                  },
+                  {
+                    id: 'lilies',
+                    emoji: '🌼',
+                    name: 'Lily',
+                    meaning: 'Kesucian, keindahan, dan harapan akan hari-hari yang lebih baik.',
+                    color: 'yellow'
+                  },
+                  {
+                    id: 'peonies',
+                    emoji: '💮',
+                    name: 'Peony',
+                    meaning: 'Kemewahan, kemakmuran cinta, dan hubungan yang penuh berkah.',
+                    color: 'purple'
+                  },
+                  {
+                    id: 'lavender',
+                    emoji: '💜',
+                    name: 'Lavender',
+                    meaning: 'Ketenangan, kesetiaan, dan cinta yang tumbuh perlahan namun pasti.',
+                    color: 'violet'
+                  },
+                  {
+                    id: 'cherry_blossom',
+                    emoji: '🌺',
+                    name: 'Sakura',
+                    meaning: 'Keindahan sesaat yang tak terlupakan — setiap momen bersamamu adalah hadiah.',
+                    color: 'pink'
+                  }
+                ].map((bouquet) => {
+                  const isSelected = giftData.finale.bouquetType === bouquet.id;
+                  return (
+                    <button
+                      key={bouquet.id}
+                      onClick={() => updateFinale('bouquetType', bouquet.id)}
+                      className={`p-4 rounded-2xl border-2 text-left flex flex-col gap-2 transition-all ${
+                        isSelected
+                          ? 'border-rose-400 bg-rose-50/60 shadow-md shadow-rose-100 ring-2 ring-rose-200'
+                          : 'border-stone-200 bg-white hover:border-rose-300 hover:bg-rose-50/30'
+                      }`}
+                    >
+                      <div className="text-3xl">{bouquet.emoji}</div>
+                      <div>
+                        <p className={`text-sm font-bold ${ isSelected ? 'text-rose-700' : 'text-stone-700' }`}>
+                          {bouquet.name}
+                        </p>
+                        <p className="text-[11px] text-stone-400 leading-snug mt-0.5">{bouquet.meaning}</p>
+                      </div>
+                      {isSelected && (
+                        <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">✓ Dipilih</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Finale message */}
+              <div className="p-5 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-2 mt-2">
                 <label className="text-xs font-bold text-rose-700 flex items-center gap-1">
-                  <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" /> Kalimat Penutup Akhir (Buket Finale):
+                  <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" /> Kalimat Penutup:
                 </label>
                 <input
                   type="text"
@@ -1020,8 +1196,8 @@ export default function CreatorStudio() {
             </motion.div>
           )}
 
-          {/* STEP 5: Selesai & Bagikan */}
-          {currentStep === 5 && (
+          {/* STEP 6: Selesai & Bagikan */}
+          {currentStep === 6 && (
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6 text-center py-6">
               <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center mx-auto shadow-inner">
                 <CheckCircle2 className="w-10 h-10" />
@@ -1089,12 +1265,19 @@ export default function CreatorStudio() {
               <ChevronLeft className="w-4 h-4" /> Kembali
             </button>
 
-            {currentStep < 4 ? (
+            {currentStep < 5 ? (
               <button
-                onClick={() => setCurrentStep((prev) => Math.min(4, prev + 1))}
+                onClick={() => setCurrentStep((prev) => Math.min(5, prev + 1))}
                 className="flex items-center gap-1 py-2.5 px-5 bg-stone-900 hover:bg-stone-800 text-white text-sm font-semibold rounded-xl transition"
               >
                 Lanjut <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : currentStep === 5 ? (
+              <button
+                onClick={() => setCurrentStep(6)}
+                className="flex items-center gap-1 py-2.5 px-5 bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold rounded-xl transition shadow-md shadow-rose-100"
+              >
+                Lanjut ke Terbitkan <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <div className="flex items-center gap-3 w-[45%]">

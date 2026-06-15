@@ -31,6 +31,7 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
       case 4:
         return 'STORY';
       case 5:
+      case 6:
         return 'FINALE';
       default:
         return 'INTRO';
@@ -157,6 +158,7 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
                 content={giftData.content}
                 musicUrl={giftData.musicUrl}
                 isMuted={isMuted}
+                cardStyle={giftData.theme.cardStyle}
                 onToggleMute={handleToggleMute}
                 onComplete={() => setStage('FINALE')}
               />
@@ -167,11 +169,11 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
         {stage === 'FINALE' && (
           <motion.div
             key="finale"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 20 }}
-            className="w-full flex justify-center z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 z-10"
           >
             <FinaleStage
               message={giftData.finale.message}
