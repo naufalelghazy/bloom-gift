@@ -224,6 +224,15 @@ export default function CreatorStudio() {
     }));
   };
 
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -238,6 +247,14 @@ export default function CreatorStudio() {
     setIsUploading((prev) => ({ ...prev, [index]: true }));
 
     try {
+      // Check if Supabase URL is placeholder
+      const isSupabaseUrlPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                                       process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co';
+      
+      if (isSupabaseUrlPlaceholder) {
+        throw new Error('Supabase not configured');
+      }
+
       const fileExt = file.name.split('.').pop();
       const randomString = Math.random().toString(36).substring(2, 15);
       const fileName = `${randomString}_${Date.now()}.${fileExt}`;
@@ -259,8 +276,13 @@ export default function CreatorStudio() {
 
       handleContentChange(index, 'url', publicUrl);
     } catch (err: any) {
-      console.error('Upload error:', err);
-      alert(`Gagal mengunggah gambar: ${err.message || 'Error tidak diketahui. Pastikan Anda telah membuat bucket storage "gift-images" di dashboard Supabase.'}`);
+      console.warn('Supabase storage not available, falling back to local Base64 uploader:', err.message || err);
+      try {
+        const base64Url = await readFileAsDataURL(file);
+        handleContentChange(index, 'url', base64Url);
+      } catch (readErr) {
+        alert('Gagal membaca file lokal.');
+      }
     } finally {
       setIsUploading((prev) => ({ ...prev, [index]: false }));
     }
@@ -280,6 +302,13 @@ export default function CreatorStudio() {
     setIsMusicUploading(true);
 
     try {
+      const isSupabaseUrlPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                                       process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co';
+      
+      if (isSupabaseUrlPlaceholder) {
+        throw new Error('Supabase not configured');
+      }
+
       const fileExt = file.name.split('.').pop();
       const randomString = Math.random().toString(36).substring(2, 15);
       const fileName = `music_${randomString}_${Date.now()}.${fileExt}`;
@@ -302,8 +331,14 @@ export default function CreatorStudio() {
       setGiftData((prev) => ({ ...prev, musicUrl: publicUrl }));
       setUploadedMusicName(file.name);
     } catch (err: any) {
-      console.error('Music upload error:', err);
-      alert(`Gagal mengunggah musik: ${err.message || 'Error tidak diketahui.'}`);
+      console.warn('Supabase storage not available, falling back to local Base64 audio:', err.message || err);
+      try {
+        const base64Url = await readFileAsDataURL(file);
+        setGiftData((prev) => ({ ...prev, musicUrl: base64Url }));
+        setUploadedMusicName(file.name);
+      } catch (readErr) {
+        alert('Gagal membaca file lokal.');
+      }
     } finally {
       setIsMusicUploading(false);
     }
@@ -328,11 +363,27 @@ export default function CreatorStudio() {
       return;
     }
 
+    if (giftData.security.gateType === 'pin' && !giftData.security.passcode) {
+      alert('Kode PIN tidak boleh kosong jika pengaman PIN aktif.');
+      return;
+    }
+
+    if (giftData.security.gateType === 'question' && (!giftData.security.question || !giftData.security.passcode)) {
+      alert('Pertanyaan dan Jawaban rahasia tidak boleh kosong jika pengaman Pertanyaan aktif.');
+      return;
+    }
+
     setIsSubmitting(true);
     let savedToCloud = false;
 
     // 1. Coba simpan ke Supabase
     try {
+      const isSupabaseUrlPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                                       process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co';
+      if (isSupabaseUrlPlaceholder) {
+        throw new Error('Supabase not configured');
+      }
+
       const { error } = await supabase
         .from('gifts')
         .insert([giftData]);
