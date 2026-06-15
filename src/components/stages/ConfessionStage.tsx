@@ -759,44 +759,46 @@ export default function ConfessionStage({
                 })()}
               </p>
 
-              {/* Circular Wax Stamp SVG */}
-              <svg width="72" height="72" viewBox="0 0 100 100" className="mx-auto my-1 drop-shadow-sm">
+              {/* Circular Distressed Ink Stamp SVG */}
+              <svg width="80" height="80" viewBox="0 0 100 100" className="mx-auto my-1 drop-shadow-xs">
                 <defs>
-                  <radialGradient id="certSealGrad" cx="35%" cy="35%" r="70%">
-                    <stop offset="0%" stopColor="#f5bec4" />
-                    <stop offset="30%" stopColor="#e28c96" />
-                    <stop offset="75%" stopColor="#c45c68" />
-                    <stop offset="100%" stopColor="#9c3a44" />
-                  </radialGradient>
-                  <radialGradient id="certInnerGrad" cx="30%" cy="30%" r="70%">
-                    <stop offset="0%" stopColor="#e58e98" />
-                    <stop offset="75%" stopColor="#c65e6b" />
-                    <stop offset="100%" stopColor="#a33f4b" />
-                  </radialGradient>
+                  {/* Distressed / Ink Bleed SVG filter */}
+                  <filter id="inkStampFilter" x="-10%" y="-10%" width="120%" height="120%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="3" result="noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+                    <feGaussianBlur in="displaced" stdDeviation="0.4" />
+                  </filter>
                 </defs>
-                {/* Outer irregular circle rim */}
-                <path 
-                  d="M50,10 C62,8 78,13 84,24 C90,35 94,48 90,60 C86,72 80,84 68,88 C56,92 42,94 32,88 C22,82 12,70 10,58 C8,46 10,32 18,22 C26,12 38,12 50,10 Z" 
-                  fill="url(#certSealGrad)" 
-                />
-                {/* Outer detail rings */}
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#f2c4c9" strokeWidth="1" strokeDasharray="3 2" opacity="0.6" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#f2c4c9" strokeWidth="0.8" opacity="0.5" />
-                {/* Inner circle depression */}
-                <path 
-                  d="M50,18 C58,18 70,22 74,30 C78,38 82,46 80,54 C78,62 74,70 66,74 C58,78 48,80 40,76 C32,72 24,64 22,56 C20,48 22,38 28,30 C34,22 42,18 50,18 Z" 
-                  fill="url(#certInnerGrad)" 
-                />
-                {/* Heart with leafy swirls stamp in center */}
-                <path 
-                  d="M50,38 C44,28 30,34 30,48 C30,62 50,72 50,72 C50,72 70,62 70,48 C70,34 56,28 50,38 Z" 
-                  fill="none" 
-                  stroke="#fff" 
-                  strokeWidth="2.2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  opacity="0.85"
-                />
+                
+                {/* Stamp Group with Filter applied */}
+                <g filter="url(#inkStampFilter)" fill="none" stroke="#d66874" strokeWidth="2" opacity="0.8">
+                  {/* Outer rough circular border */}
+                  <circle cx="50" cy="50" r="44" strokeWidth="2.5" />
+                  {/* Inner thin circle */}
+                  <circle cx="50" cy="50" r="38" strokeWidth="1" />
+                  {/* Inner decorative dotted ring */}
+                  <circle cx="50" cy="50" r="34" strokeWidth="1.2" strokeDasharray="3 3" />
+                  
+                  {/* Ornate Heart in Center */}
+                  <path 
+                    d="M 50 34 C 44 22, 25 28, 25 44 C 25 58, 50 72, 50 72 C 50 72, 75 58, 75 44 C 75 28, 56 22, 50 34 Z" 
+                    strokeWidth="2.5"
+                  />
+                  
+                  {/* Sprouting plant/flourish inside the heart */}
+                  <path d="M 50 70 L 50 56" strokeWidth="2" />
+                  <path d="M 50 56 C 45 52, 40 45, 45 38" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M 50 56 C 55 52, 60 45, 55 38" strokeWidth="1.8" strokeLinecap="round" />
+                  <path d="M 50 56 C 47 48, 53 48, 50 38" strokeWidth="1.5" strokeLinecap="round" />
+                  
+                  {/* Ornate leaves outside the heart (left and right) */}
+                  <path d="M 24 54 C 20 62, 32 68, 40 68" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M 76 54 C 80 62, 68 68, 60 68" strokeWidth="1.5" strokeLinecap="round" />
+                  
+                  {/* Tiny stars or dots inside stamp */}
+                  <circle cx="28" cy="32" r="1" fill="#d66874" stroke="none" />
+                  <circle cx="72" cy="32" r="1" fill="#d66874" stroke="none" />
+                </g>
               </svg>
 
               {/* Dynamic Footer text */}
@@ -806,8 +808,19 @@ export default function ConfessionStage({
                   const idx = text.toLowerCase().indexOf("dari");
                   if (idx !== -1) {
                     let footer = text.substring(idx).trim();
-                    if (!footer.endsWith("ya.") && !footer.endsWith("ya")) {
+                    
+                    // Remove "screenshot..." instruction from footer text to avoid double styling
+                    const ssIdx = footer.toLowerCase().indexOf("screenshot");
+                    if (ssIdx !== -1) {
+                      footer = footer.substring(0, ssIdx).trim();
+                      footer = footer.replace(/[.,\s\-/]+$/, "").trim();
+                    }
+
+                    const lowerFooter = footer.toLowerCase();
+                    if (!lowerFooter.includes("simpan baik-baik") && !lowerFooter.endsWith("ya.") && !lowerFooter.endsWith("ya")) {
                       footer += ". Simpan baik-baik ya.";
+                    } else if (!footer.endsWith(".") && footer.length > 0) {
+                      footer += ".";
                     }
                     return footer;
                   }
