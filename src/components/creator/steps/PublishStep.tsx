@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Link2 } from 'lucide-react';
 import { GiftData } from '@/data/mockGifts';
+import Image from 'next/image';
 
 interface PublishStepProps {
   giftData: GiftData;
@@ -44,14 +45,16 @@ export default function PublishStep({ giftData, saveLocation, setIsPublished, se
 
       {/* QR Code Container */}
       <div className="bg-white p-4 rounded-[24px] border border-stone-200 max-w-[190px] mx-auto shadow-xs flex flex-col items-center gap-2">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
             typeof window !== 'undefined' ? `${window.location.origin}/g/${giftData.slug}` : `https://bloom-gift/g/${giftData.slug}`
           )}`}
           alt="QR Code Kado"
+          width={128}
+          height={128}
           className="w-32 h-32 object-contain select-none"
           draggable={false}
+          unoptimized
         />
         <span className="text-[9px] font-bold text-stone-400 uppercase tracking-wider select-none">Pindai untuk Membuka 📱</span>
       </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
+import Image from 'next/image';
 
 interface FinaleStageProps {
   message: string;
@@ -18,7 +19,7 @@ const BOUQUET_DATA: Record<string, {
   flowers: { name: string; meaning: string }[];
 }> = {
   pink_roses: {
-    image: '/bouquets/pink_roses.png',
+    image: '/bouquets/pink_roses.webp',
     label: 'KASIH',
     subtitle: 'Untukmu, yang selalu hadir.',
     flowers: [
@@ -28,7 +29,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   red_roses: {
-    image: '/bouquets/red_roses.png',
+    image: '/bouquets/red_roses.webp',
     label: 'CINTA',
     subtitle: 'Sepenuh hati, hanya untukmu.',
     flowers: [
@@ -38,7 +39,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   tulips: {
-    image: '/bouquets/tulips.png',
+    image: '/bouquets/tulips.webp',
     label: 'KESETIAAN',
     subtitle: 'Bersamamu di setiap musim.',
     flowers: [
@@ -48,7 +49,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   sunflowers: {
-    image: '/bouquets/sunflowers.png',
+    image: '/bouquets/sunflowers.webp',
     label: 'KEBAHAGIAAN',
     subtitle: 'Seperti matahari, kamu selalu terang.',
     flowers: [
@@ -58,7 +59,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   lilies: {
-    image: '/bouquets/lilies.png',
+    image: '/bouquets/lilies.webp',
     label: 'KESUCIAN',
     subtitle: 'Tulus dan apa adanya.',
     flowers: [
@@ -68,7 +69,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   peonies: {
-    image: '/bouquets/peonies.png',
+    image: '/bouquets/peonies.webp',
     label: 'KEMEWAHAN',
     subtitle: 'Cinta yang berlimpah ruah.',
     flowers: [
@@ -78,7 +79,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   lavender: {
-    image: '/bouquets/lavender.png',
+    image: '/bouquets/lavender.webp',
     label: 'KETENANGAN',
     subtitle: 'Bersamamu, hatiku tenang.',
     flowers: [
@@ -88,7 +89,7 @@ const BOUQUET_DATA: Record<string, {
     ],
   },
   cherry_blossom: {
-    image: '/bouquets/cherry_blossom.png',
+    image: '/bouquets/cherry_blossom.webp',
     label: 'APRESIASI',
     subtitle: 'Terima kasih karena tetap ada.',
     flowers: [
@@ -150,12 +151,14 @@ export default function FinaleStage({ message, bouquetType, onRestart }: FinaleS
         transition={{ duration: 0.8, ease: 'easeOut' }}
         onClick={handleBouquetClick}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={data.image}
           alt="Bouquet"
+          fill
+          sizes="100vw"
           className="w-full h-full object-cover object-top cursor-pointer select-none"
           draggable={false}
+          priority
         />
 
         {/* Tap ripple overlay */}

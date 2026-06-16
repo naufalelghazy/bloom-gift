@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
@@ -18,20 +19,19 @@ export default function Home() {
 
       {/* Background soft botanical illustrations */}
       <div className="absolute -bottom-16 -left-16 w-64 h-64 pointer-events-none opacity-20 select-none z-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/intro_rose.png" alt="Rose Deco" className="w-full h-full object-contain rotate-12" />
+        <Image src="/intro_rose.webp" alt="Rose Deco" width={256} height={256} className="w-full h-full object-contain rotate-12" />
       </div>
       <div className="absolute top-12 -right-16 w-56 h-56 pointer-events-none opacity-15 select-none z-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/intro_heart.png" alt="Heart Deco" className="w-full h-full object-contain -rotate-12" />
+        <Image src="/intro_heart.webp" alt="Heart Deco" width={224} height={224} className="w-full h-full object-contain -rotate-12" />
       </div>
 
       {/* Decorative hanging rose ornament at the top */}
       <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none select-none z-10 overflow-hidden h-32">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/lock_ornament.png?v=3"
+        <Image
+          src="/lock_ornament.webp"
           alt="Rose Ornament"
+          width={192}
+          height={128}
           className="w-48 object-contain -translate-y-4 opacity-90 drop-shadow-xs"
         />
       </div>

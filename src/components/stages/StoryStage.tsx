@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { GiftContent } from '@/data/mockGifts';
+import Image from 'next/image';
 
 interface StoryStageProps {
   content: GiftContent[];
@@ -364,17 +365,18 @@ export default function StoryStage({
               <div className="flex flex-col items-center w-full z-10 gap-3">
                 {/* Image Container directly on card */}
                 <div 
-                  className="w-full max-w-[240px] aspect-square overflow-hidden rounded-2xl border border-[#eedcc5]/60 shadow-sm bg-stone-50 cursor-zoom-in active:scale-98 transition-transform"
+                  className="relative w-full max-w-[240px] aspect-square overflow-hidden rounded-2xl border border-[#eedcc5]/60 shadow-sm bg-stone-50 cursor-zoom-in active:scale-98 transition-transform"
                   onClick={() => {
                     if (currentItem.url) {
                       setLightboxItem({ url: currentItem.url, caption: currentItem.caption });
                     }
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={currentItem.url}
+                  <Image
+                    src={currentItem.url || ''}
                     alt={currentItem.caption || 'Memory'}
+                    fill
+                    sizes="(max-width: 640px) 240px, 240px"
                     className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
                   />
                 </div>
@@ -455,13 +457,15 @@ export default function StoryStage({
               className="max-w-md w-full flex flex-col items-center gap-4 p-2"
               onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image container itself
             >
-              <div className="w-full aspect-square overflow-hidden rounded-[24px] border border-white/10 bg-black/20 shadow-2xl">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+              <div className="relative w-full aspect-square overflow-hidden rounded-[24px] border border-white/10 bg-black/20 shadow-2xl">
+                <Image
                   src={lightboxItem.url}
                   alt={lightboxItem.caption || 'Memory Detail'}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 450px"
                   className="w-full h-full object-contain"
                   draggable={false}
+                  unoptimized
                 />
               </div>
               {lightboxItem.caption && (

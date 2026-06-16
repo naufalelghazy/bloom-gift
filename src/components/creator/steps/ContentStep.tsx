@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { BookOpen, Plus, Trash2, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { GiftData, GiftContent } from '@/data/mockGifts';
 import { CARD_THEMES } from '../constants';
+import Image from 'next/image';
 
 interface ContentStepProps {
   giftData: GiftData;
@@ -127,14 +128,19 @@ export default function ContentStep({
                       <div className="flex flex-col sm:flex-row items-center gap-4">
 
                         {/* Image Preview / Upload Status Area */}
-                        <div className="w-24 h-24 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0 relative group/preview shadow-inner">
+                        <div className="relative w-24 h-24 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0 group/preview shadow-inner">
                           {isUploading[idx] ? (
                             <Loader2 className="w-6 h-6 text-rose-500 animate-spin" />
                           ) : item.url ? (
                             <>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={item.url} alt="Pratinjau" className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
+                              <Image
+                                src={item.url}
+                                alt="Pratinjau"
+                                fill
+                                sizes="96px"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center z-10">
                                 <button
                                   type="button"
                                   onClick={() => handleContentChange(idx, 'url', '')}

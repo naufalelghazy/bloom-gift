@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
+
+const MotionImage = motion(Image);
 
 interface IntroStageProps {
   intro: {
@@ -13,8 +16,6 @@ interface IntroStageProps {
 }
 
 export default function IntroStage({ intro, flowerStyle = 'rose', onComplete }: IntroStageProps) {
-  console.log('flowerStyle in IntroStage:', flowerStyle);
-  
   const [isAppeared, setIsAppeared] = useState(false);
 
   useEffect(() => {
@@ -39,9 +40,11 @@ export default function IntroStage({ intro, flowerStyle = 'rose', onComplete }: 
       case 'heart':
         return (
           <div className="relative w-48 h-48 flex items-center justify-center">
-            <motion.img
-              src="/intro_heart.png"
+            <MotionImage
+              src="/intro_heart.webp"
               alt="Heart"
+              width={144}
+              height={144}
               className="w-36 h-36 object-contain select-none z-10"
               initial={{ scale: 0, opacity: 0 }}
               animate={{
@@ -94,9 +97,11 @@ export default function IntroStage({ intro, flowerStyle = 'rose', onComplete }: 
       case 'fireworks':
         return (
           <div className="relative w-48 h-48 flex items-center justify-center">
-            <motion.img
-              src="/intro_sparkles.png"
+            <MotionImage
+              src="/intro_sparkles.webp"
               alt="Sparkles"
+              width={160}
+              height={160}
               className="w-40 h-40 object-contain select-none z-10"
               initial={{ scale: 0, rotate: -45, opacity: 0 }}
               animate={{
@@ -312,9 +317,11 @@ export default function IntroStage({ intro, flowerStyle = 'rose', onComplete }: 
       default:
         return (
           <div className="relative w-48 h-48 flex items-center justify-center">
-            <motion.img
-              src="/intro_rose.png"
+            <MotionImage
+              src="/intro_rose.webp"
               alt="Rose"
+              width={160}
+              height={160}
               className="w-40 h-40 object-contain select-none z-10"
               initial={{ scale: 0, rotate: -30, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}

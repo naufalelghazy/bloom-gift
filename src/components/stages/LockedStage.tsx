@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GiftSecurity } from '@/data/mockGifts';
+import Image from 'next/image';
 
 interface LockedStageProps {
   security: GiftSecurity;
@@ -83,8 +84,7 @@ export default function LockedStage({ security, onUnlock }: LockedStageProps) {
       >
         {/* Lock header illustration */}
         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 w-[140px] h-[140px] pointer-events-none select-none z-30 drop-shadow-md">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/lock_header.png?v=2" alt="Lock" className="w-full h-full object-contain" />
+          <Image src="/lock_header.webp" alt="Lock" width={140} height={140} className="w-full h-full object-contain" priority />
         </div>
 
         <motion.div
