@@ -63,7 +63,7 @@ export default function LockedStage({ security, onUnlock }: LockedStageProps) {
   };
 
   return (
-    <div className="absolute inset-0 bg-gradient-to-br from-[#f5ebe0] via-[#f0e3d4] to-[#e6d5c3] flex items-center justify-center p-4 z-20 overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center p-4 z-20 overflow-hidden">
 
 
 

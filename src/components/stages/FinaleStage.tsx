@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 interface FinaleStageProps {
   message: string;
+  subtitle?: string;
   bouquetType: string;
   onRestart: () => void;
 }
@@ -111,7 +112,7 @@ interface Particle {
   type: 'heart' | 'petal';
 }
 
-export default function FinaleStage({ message, bouquetType, onRestart }: FinaleStageProps) {
+export default function FinaleStage({ message, subtitle, bouquetType, onRestart }: FinaleStageProps) {
   const [tapped, setTapped] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const data = BOUQUET_DATA[bouquetType] ?? FALLBACK;
@@ -239,7 +240,7 @@ export default function FinaleStage({ message, bouquetType, onRestart }: FinaleS
         </h2>
 
         {/* Subtitle */}
-        <p className="text-center text-sm text-[#7a5c5c]">{data.subtitle}</p>
+        <p className="text-center text-sm text-[#7a5c5c]">{subtitle !== undefined ? subtitle : data.subtitle}</p>
 
         {/* Flower meaning tags */}
         <div className="flex flex-wrap justify-center gap-2 mt-1">

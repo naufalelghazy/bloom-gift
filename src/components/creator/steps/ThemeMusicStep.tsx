@@ -183,16 +183,7 @@ export default function ThemeMusicStep({
             </button>
           ))}
         </div>
-        <div className="pt-2">
-          <label className="text-xs text-stone-400 block mb-1">Atau masukkan URL musik MP3 Anda sendiri:</label>
-          <input
-            type="text"
-            value={giftData.musicUrl}
-            onChange={(e) => setGiftData(prev => ({ ...prev, musicUrl: e.target.value }))}
-            className="w-full px-4 py-2 border border-stone-200 rounded-xl bg-white text-xs focus:ring-rose-200 focus:border-rose-400 focus:outline-none"
-            placeholder="https://example.com/song.mp3"
-          />
-        </div>
+
 
         {/* Custom local MP3 uploader */}
         <div className="pt-2 border-t border-stone-100 mt-2">

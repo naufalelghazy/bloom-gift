@@ -147,6 +147,7 @@ export const DEFAULT_GIFT_DATA: GiftData = {
   },
   finale: {
     message: 'Terima kasih sudah membaca sampai akhir. I love you!',
+    subtitle: 'Untukmu, yang selalu hadir.',
     bouquetType: 'pink_roses'
   }
 };

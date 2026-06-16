@@ -217,6 +217,7 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
           >
             <FinaleStage
               message={giftData.finale.message}
+              subtitle={giftData.finale.subtitle}
               bouquetType={giftData.finale.bouquetType}
               onRestart={() => {
                 setStage(giftData.security.gateType === 'none' ? 'INTRO' : 'LOCKED');

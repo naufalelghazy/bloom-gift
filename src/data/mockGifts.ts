@@ -52,6 +52,7 @@ export interface GiftData {
   confession?: ConfessionConfig;
   finale: {
     message: string;
+    subtitle?: string;
     bouquetType: string;
   };
   view_count?: number;

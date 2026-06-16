@@ -49,18 +49,33 @@ export default function BouquetStep({ giftData, updateFinale }: BouquetStepProps
         })}
       </div>
 
-      {/* Finale message */}
-      <div className="p-5 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-2 mt-2">
-        <label className="text-xs font-bold text-rose-700 flex items-center gap-1">
-          <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" /> Kalimat Penutup:
-        </label>
-        <input
-          type="text"
-          value={giftData.finale.message}
-          onChange={(e) => updateFinale('message', e.target.value)}
-          className="w-full px-4 py-2 border border-rose-200 rounded-xl focus:ring-rose-300 focus:border-rose-400 focus:outline-none text-sm bg-white"
-          placeholder="e.g. I love you, Nara."
-        />
+      {/* Finale message & subtitle */}
+      <div className="p-5 rounded-2xl bg-rose-50/50 border border-rose-100 space-y-4 mt-2">
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-rose-700 flex items-center gap-1">
+            <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" /> Kalimat Penutup:
+          </label>
+          <input
+            type="text"
+            value={giftData.finale.message}
+            onChange={(e) => updateFinale('message', e.target.value)}
+            className="w-full px-4 py-2 border border-rose-200 rounded-xl focus:ring-rose-300 focus:border-rose-400 focus:outline-none text-sm bg-white"
+            placeholder="e.g. I love you, Nara."
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-rose-700 flex items-center gap-1">
+            ✨ Sub-kalimat (Keterangan):
+          </label>
+          <input
+            type="text"
+            value={giftData.finale.subtitle || ''}
+            onChange={(e) => updateFinale('subtitle', e.target.value)}
+            className="w-full px-4 py-2 border border-rose-200 rounded-xl focus:ring-rose-300 focus:border-rose-400 focus:outline-none text-sm bg-white"
+            placeholder="e.g. Untukmu, yang selalu hadir."
+          />
+        </div>
       </div>
     </motion.div>
   );
