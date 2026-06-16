@@ -372,13 +372,15 @@ export default function StoryStage({
                     }
                   }}
                 >
-                  <Image
-                    src={currentItem.url || ''}
-                    alt={currentItem.caption || 'Memory'}
-                    fill
-                    sizes="(max-width: 640px) 240px, 240px"
-                    className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
-                  />
+                  {currentItem.url && (
+                    <Image
+                      src={currentItem.url}
+                      alt={currentItem.caption || 'Memory'}
+                      fill
+                      sizes="(max-width: 640px) 240px, 240px"
+                      className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
+                    />
+                  )}
                 </div>
                 {/* Caption directly on the card background */}
                 {currentItem.caption && (

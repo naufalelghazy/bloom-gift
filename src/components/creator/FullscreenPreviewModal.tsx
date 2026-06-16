@@ -10,9 +10,10 @@ interface FullscreenPreviewModalProps {
   onClose: () => void;
   giftData: GiftData;
   previewKey: number;
+  activeStep: number;
 }
 
-export default function FullscreenPreviewModal({ show, onClose, giftData, previewKey }: FullscreenPreviewModalProps) {
+export default function FullscreenPreviewModal({ show, onClose, giftData, previewKey, activeStep }: FullscreenPreviewModalProps) {
   return (
     <AnimatePresence>
       {show && (
@@ -36,9 +37,10 @@ export default function FullscreenPreviewModal({ show, onClose, giftData, previe
 
             <div className="flex-1 w-full h-full relative overflow-hidden bg-white">
               <GiftViewer
-                key={`fullscreen-${previewKey}-${giftData.theme.flowerStyle}-${giftData.theme.palette}`}
+                key={`fullscreen-${previewKey}-${activeStep}-${giftData.theme.flowerStyle}-${giftData.theme.palette}`}
                 giftData={giftData}
-                isPreview={false}
+                isPreview={true}
+                activeStep={activeStep}
               />
             </div>
           </motion.div>

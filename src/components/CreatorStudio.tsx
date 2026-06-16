@@ -187,6 +187,7 @@ export default function CreatorStudio() {
         onClose={() => editor.setIsFullscreenPreview(false)}
         giftData={editor.giftData}
         previewKey={editor.previewKey}
+        activeStep={editor.currentStep}
       />
 
       {/* Floating Preview Button for Mobile viewports */}
