@@ -13,12 +13,8 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col min-h-screen w-full bg-gradient-to-tr from-[#faf6f0] via-[#fbf3eb] to-[#eedcc5] items-center justify-between p-6 overflow-hidden text-stone-800 font-sans">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
-        .font-garamond {
-          font-family: 'EB Garamond', serif;
-        }
-      `}</style>
+
+
 
       {/* Background soft botanical illustrations */}
       <div className="absolute -bottom-16 -left-16 w-64 h-64 pointer-events-none opacity-20 select-none z-0">

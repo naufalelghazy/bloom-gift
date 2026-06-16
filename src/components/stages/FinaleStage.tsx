@@ -229,12 +229,11 @@ export default function FinaleStage({ message, bouquetType, onRestart }: FinaleS
 
         {/* Script title */}
         <h2
-          className="text-center leading-snug text-[#6b3a3a]"
-          style={{ fontFamily: "'Dancing Script', cursive", fontSize: '1.55rem', fontWeight: 700 }}
+          className="text-center leading-snug text-[#6b3a3a] font-dancing-script"
+          style={{ fontSize: '1.55rem', fontWeight: 700 }}
         >
           {message || 'Untukmu, yang selalu ada'}
         </h2>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');`}</style>
 
         {/* Subtitle */}
         <p className="text-center text-sm text-[#7a5c5c]">{data.subtitle}</p>

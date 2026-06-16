@@ -208,10 +208,6 @@ export default function StoryStage({
   return (
     <div className="w-full max-w-md flex flex-col items-center justify-between min-h-[500px] p-6 relative">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
-        .font-garamond {
-          font-family: 'EB Garamond', serif;
-        }
         .lined-paper-story {
           background-color: #faf8f5;
           background-image: linear-gradient(rgba(219, 119, 128, 0.045) 1.5px, transparent 1.5px);

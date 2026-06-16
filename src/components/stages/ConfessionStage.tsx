@@ -125,10 +125,6 @@ export default function ConfessionStage({
     <div className="w-full max-w-md p-4 flex flex-col justify-center items-center min-h-[500px]">
       {/* Global Style Injector for Caveat font and lined paper */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap');
-        .font-caveat {
-          font-family: 'Caveat', cursive;
-        }
         .lined-paper-envelope {
           background-color: #faf6f0;
           background-image: linear-gradient(rgba(219, 119, 128, 0.04) 1.2px, transparent 1.2px);

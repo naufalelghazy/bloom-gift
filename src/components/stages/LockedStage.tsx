@@ -63,12 +63,8 @@ export default function LockedStage({ security, onUnlock }: LockedStageProps) {
 
   return (
     <div className="absolute inset-0 bg-gradient-to-br from-[#f5ebe0] via-[#f0e3d4] to-[#e6d5c3] flex items-center justify-center p-4 z-20 overflow-hidden">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
-        .font-garamond {
-          font-family: 'EB Garamond', serif;
-        }
-      `}</style>
+
+
 
       {/* Subtle background decoration */}
       <div className="absolute inset-0 pointer-events-none opacity-20 select-none">
