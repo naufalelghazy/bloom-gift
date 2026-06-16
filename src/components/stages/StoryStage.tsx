@@ -23,6 +23,7 @@ export default function StoryStage({
 }: StoryStageProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [lightboxItem, setLightboxItem] = useState<{ url: string; caption?: string } | null>(null);
 
   const slideVariants = {
     enter: (dir: number) => ({
@@ -257,10 +258,62 @@ export default function StoryStage({
             {/* Midnight Galaxy Background Stars */}
             {cardStyle === 'midnight' && (
               <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-                {/* Glowing purple nebulae */}
-                <div className="absolute top-1/4 left-1/3 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl" />
-                <div className="absolute bottom-1/4 right-1/4 w-36 h-36 bg-blue-500/10 rounded-full blur-3xl" />
+                {/* Glowing purple nebulae with pulsing animation */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.1, 0.18, 0.1]
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                  className="absolute top-1/4 left-1/3 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"
+                />
+                <motion.div
+                  animate={{
+                    scale: [1, 1.25, 1],
+                    opacity: [0.08, 0.15, 0.08]
+                  }}
+                  transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: 2
+                  }}
+                  className="absolute bottom-1/4 right-1/4 w-36 h-36 bg-blue-500/10 rounded-full blur-3xl"
+                />
                 
+                {/* Shooting stars */}
+                {[
+                  { top: '10%', left: '80%', delay: 4 },
+                  { top: '30%', left: '90%', delay: 8 },
+                  { top: '50%', left: '70%', delay: 12 }
+                ].map((s, idx) => (
+                  <motion.div
+                    key={`shooting-${idx}`}
+                    className="absolute h-[1.5px] w-12 bg-gradient-to-r from-white via-amber-100 to-transparent pointer-events-none rounded-full"
+                    style={{
+                      top: s.top,
+                      left: s.left,
+                      transform: 'rotate(-45deg)',
+                      transformOrigin: 'left center',
+                    }}
+                    animate={{
+                      x: [0, -180],
+                      y: [0, 180],
+                      opacity: [0, 1, 1, 0]
+                    }}
+                    transition={{
+                      duration: 1.4,
+                      repeat: Infinity,
+                      repeatDelay: s.delay,
+                      ease: 'easeOut'
+                    }}
+                  />
+                ))}
+
                 {/* Scattered stars */}
                 {[
                   { top: '15%', left: '10%', size: 'w-1.5 h-1.5', delay: '0s' },
@@ -314,12 +367,19 @@ export default function StoryStage({
             {currentItem.type === 'image' && (
               <div className="flex flex-col items-center w-full z-10 gap-3">
                 {/* Image Container directly on card */}
-                <div className="w-full max-w-[240px] aspect-square overflow-hidden rounded-2xl border border-[#eedcc5]/60 shadow-sm bg-stone-50">
+                <div 
+                  className="w-full max-w-[240px] aspect-square overflow-hidden rounded-2xl border border-[#eedcc5]/60 shadow-sm bg-stone-50 cursor-zoom-in active:scale-98 transition-transform"
+                  onClick={() => {
+                    if (currentItem.url) {
+                      setLightboxItem({ url: currentItem.url, caption: currentItem.caption });
+                    }
+                  }}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={currentItem.url}
                     alt={currentItem.caption || 'Memory'}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
                   />
                 </div>
                 {/* Caption directly on the card background */}
@@ -369,6 +429,54 @@ export default function StoryStage({
           )}
         </button>
       </div>
+
+      {/* Image Lightbox Modal */}
+      <AnimatePresence>
+        {lightboxItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxItem(null)}
+            className="fixed inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4 cursor-zoom-out select-none"
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setLightboxItem(null)}
+              className="absolute top-6 right-6 p-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-full transition cursor-pointer z-50"
+              title="Tutup"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              className="max-w-md w-full flex flex-col items-center gap-4 p-2"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image container itself
+            >
+              <div className="w-full aspect-square overflow-hidden rounded-[24px] border border-white/10 bg-black/20 shadow-2xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={lightboxItem.url}
+                  alt={lightboxItem.caption || 'Memory Detail'}
+                  className="w-full h-full object-contain"
+                  draggable={false}
+                />
+              </div>
+              {lightboxItem.caption && (
+                <p className="text-white text-center font-garamond italic text-[20px] font-semibold px-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] leading-relaxed">
+                  {lightboxItem.caption}
+                </p>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

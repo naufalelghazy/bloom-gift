@@ -101,9 +101,42 @@ const BOUQUET_DATA: Record<string, {
 
 const FALLBACK = BOUQUET_DATA['cherry_blossom'];
 
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+  type: 'heart' | 'petal';
+}
+
 export default function FinaleStage({ message, bouquetType, onRestart }: FinaleStageProps) {
   const [tapped, setTapped] = useState(false);
+  const [particles, setParticles] = useState<Particle[]>([]);
   const data = BOUQUET_DATA[bouquetType] ?? FALLBACK;
+
+  const handleBouquetClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Spawn 6 random particles
+    const newParticles: Particle[] = Array.from({ length: 6 }).map((_, i) => ({
+      id: Date.now() + Math.random() + i,
+      x,
+      y,
+      rotation: Math.random() * 360,
+      scale: 0.5 + Math.random() * 0.7,
+      type: Math.random() > 0.4 ? 'petal' : 'heart'
+    }));
+
+    setParticles((prev) => [...prev, ...newParticles]);
+    setTapped(true);
+  };
+
+  const removeParticle = (id: number) => {
+    setParticles((prev) => prev.filter((p) => p.id !== id));
+  };
 
   return (
     <div className="w-full h-full flex flex-col items-stretch bg-[#f8f5f0] relative overflow-hidden">
@@ -115,7 +148,7 @@ export default function FinaleStage({ message, bouquetType, onRestart }: FinaleS
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
-        onClick={() => setTapped(true)}
+        onClick={handleBouquetClick}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -130,13 +163,54 @@ export default function FinaleStage({ message, bouquetType, onRestart }: FinaleS
           {tapped && (
             <motion.div
               key="ripple"
-              className="absolute inset-0 bg-white/30 pointer-events-none"
+              className="absolute inset-0 bg-white/20 pointer-events-none z-20"
               initial={{ opacity: 0.5 }}
               animate={{ opacity: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
+              onAnimationComplete={() => setTapped(false)}
+              transition={{ duration: 0.4 }}
             />
           )}
+        </AnimatePresence>
+
+        {/* Floating particles */}
+        <AnimatePresence>
+          {particles.map((p) => (
+            <motion.div
+              key={p.id}
+              initial={{
+                opacity: 0.9,
+                scale: p.scale,
+                x: p.x,
+                y: p.y,
+                rotate: p.rotation
+              }}
+              animate={{
+                opacity: 0,
+                y: p.y - 200 - Math.random() * 80,
+                x: p.x + (Math.random() - 0.5) * 160,
+                rotate: p.rotation + (Math.random() - 0.5) * 240,
+                scale: p.scale * 0.6
+              }}
+              exit={{ opacity: 0 }}
+              onAnimationComplete={() => removeParticle(p.id)}
+              className="absolute pointer-events-none z-30 select-none text-xl"
+              style={{ originX: 0.5, originY: 0.5 }}
+              transition={{
+                duration: 1.8 + Math.random() * 0.8,
+                ease: 'easeOut'
+              }}
+            >
+              {p.type === 'heart' ? (
+                <span className="text-rose-400 drop-shadow-[0_1.5px_2px_rgba(244,63,94,0.2)]">❤️</span>
+              ) : (
+                <span 
+                  className="inline-block w-4.5 h-3 bg-rose-200/90 border border-rose-300/30 shadow-xs"
+                  style={{ borderRadius: '60% 40% 55% 45% / 60% 40% 60% 40%' }}
+                />
+              )}
+            </motion.div>
+          ))}
         </AnimatePresence>
       </motion.div>
 

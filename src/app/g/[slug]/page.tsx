@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { mockGifts, GiftData } from '@/data/mockGifts';
 import GiftViewer from '@/components/GiftViewer';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient';
 import { HeartOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -21,21 +21,23 @@ export default function GiftPage({ params }: PageProps) {
     async function loadGift() {
       setIsLoading(true);
 
-      // 1. Coba ambil dari Database Supabase
-      try {
-        const { data, error } = await supabase
-          .from('gifts')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+      // 1. Coba ambil dari Database Supabase (Hanya jika terkonfigurasi)
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await supabase
+            .from('gifts')
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-        if (data && !error) {
-          setGiftData(data as GiftData);
-          setIsLoading(false);
-          return;
+          if (data && !error) {
+            setGiftData(data as GiftData);
+            setIsLoading(false);
+            return;
+          }
+        } catch (err) {
+          console.error('Supabase fetch failed, falling back to local storage:', err);
         }
-      } catch (err) {
-        console.error('Supabase fetch failed, falling back to local storage:', err);
       }
 
       // 2. Fallback: Coba ambil dari localStorage browser

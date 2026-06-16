@@ -129,6 +129,57 @@ export default function CreatorStudio() {
     }
   });
 
+  const [showRestorePrompt, setShowRestorePrompt] = useState(false);
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
+  const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
+
+  // Load draft on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('bloom_creator_draft');
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && parsed.slug !== undefined) {
+          setShowRestorePrompt(true);
+        }
+      } catch (e) {
+        console.error('Failed to parse draft:', e);
+      }
+    }
+  }, []);
+
+  // Save draft to localStorage whenever giftData changes, but only if we are not showing the restore prompt
+  useEffect(() => {
+    if (showRestorePrompt || isPublished) return;
+
+    const saveDraft = () => {
+      localStorage.setItem('bloom_creator_draft', JSON.stringify(giftData));
+      setIsDraftSaved(true);
+      const timer = setTimeout(() => setIsDraftSaved(false), 2000);
+      return () => clearTimeout(timer);
+    };
+
+    const debounceTimer = setTimeout(saveDraft, 1000);
+    return () => clearTimeout(debounceTimer);
+  }, [giftData, showRestorePrompt, isPublished]);
+
+  const handleRestoreDraft = () => {
+    const savedDraft = localStorage.getItem('bloom_creator_draft');
+    if (savedDraft) {
+      try {
+        setGiftData(JSON.parse(savedDraft));
+      } catch (e) {
+        console.error('Failed to parse draft during restore:', e);
+      }
+    }
+    setShowRestorePrompt(false);
+  };
+
+  const handleDiscardDraft = () => {
+    localStorage.removeItem('bloom_creator_draft');
+    setShowRestorePrompt(false);
+  };
+
   // Handle updates to nested objects
   const updateTheme = (field: string, value: any) => {
     setGiftData((prev) => ({
@@ -417,6 +468,7 @@ export default function CreatorStudio() {
       setSaveLocation('local');
     }
 
+    localStorage.removeItem('bloom_creator_draft');
     setIsSubmitting(false);
     setIsPublished(true);
     setCurrentStep(6);
@@ -439,9 +491,24 @@ export default function CreatorStudio() {
             <h1 className="text-2xl font-serif font-bold text-stone-900">Bloom Gift Studio 🌸</h1>
             <p className="text-stone-500 text-xs mt-1">Rangkai hadiah digital kejutanmu</p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 bg-rose-100 text-rose-600 rounded-full">
-            Langkah {currentStep} dari 6
-          </span>
+          <div className="flex items-center gap-3">
+            <AnimatePresence>
+              {isDraftSaved && (
+                <motion.span
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-[11px] font-semibold text-emerald-600 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 shadow-xs"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Draf disimpan
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <span className="text-xs font-semibold px-3 py-1 bg-rose-100 text-rose-600 rounded-full select-none">
+              Langkah {currentStep} dari 6
+            </span>
+          </div>
         </div>
 
         {/* Wizard Form Sections */}
@@ -1277,6 +1344,20 @@ export default function CreatorStudio() {
                 </div>
               </div>
 
+              {/* QR Code Container */}
+              <div className="bg-white p-4 rounded-[24px] border border-stone-200 max-w-[190px] mx-auto shadow-xs flex flex-col items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                    typeof window !== 'undefined' ? `${window.location.origin}/g/${giftData.slug}` : `https://bloom-gift/g/${giftData.slug}`
+                  )}`}
+                  alt="QR Code Kado"
+                  className="w-32 h-32 object-contain select-none"
+                  draggable={false}
+                />
+                <span className="text-[9px] font-bold text-stone-400 uppercase tracking-wider select-none">Pindai untuk Membuka 📱</span>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto pt-4">
                 <a
                   href={`/g/${giftData.slug}`}
@@ -1363,16 +1444,24 @@ export default function CreatorStudio() {
       <div className="w-full md:w-[40%] bg-stone-100 border-l border-stone-200 flex flex-col items-center justify-center p-6 py-12 md:py-6 relative min-h-[600px] md:min-h-screen">
         
         {/* Floating instruction / reload */}
-        <div className="absolute top-4 left-4 flex items-center gap-2">
-          <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest bg-stone-200/50 px-2.5 py-1 rounded-full">
-            Live Preview
-          </span>
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest bg-stone-200/50 px-2.5 py-1 rounded-full select-none">
+              Live Preview
+            </span>
+            <button
+              onClick={restartPreview}
+              className="p-1 rounded-full text-stone-400 hover:text-stone-600 transition-colors"
+              title="Muat Ulang Pratinjau"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
           <button
-            onClick={restartPreview}
-            className="p-1 rounded-full text-stone-400 hover:text-stone-600 transition"
-            title="Muat Ulang Pratinjau"
+            onClick={() => setIsFullscreenPreview(true)}
+            className="text-[10px] font-bold text-[#c47c85] hover:text-[#b56f77] uppercase tracking-wider bg-rose-50 hover:bg-rose-100/70 border border-rose-200/60 px-3 py-1.5 rounded-full transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            🔍 Uji Layar Penuh
           </button>
         </div>
 
@@ -1394,6 +1483,77 @@ export default function CreatorStudio() {
           </div>
         </div>
       </div>
+
+      {/* Restore Draft Modal Dialog */}
+      <AnimatePresence>
+        {showRestorePrompt && (
+          <div className="fixed inset-0 bg-stone-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4 select-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#faf8f5] border border-[#eedcc5] rounded-[32px] p-8 max-w-sm w-full shadow-2xl text-center space-y-6"
+            >
+              <div className="mx-auto w-14 h-14 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-inner text-2xl">
+                💾
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-stone-900 font-serif">Pulihkan Pekerjaan?</h3>
+                <p className="text-stone-500 text-xs leading-relaxed">
+                  Kami menemukan draf kado yang belum selesai dari sesi sebelumnya. Apakah Anda ingin memulihkannya?
+                </p>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleDiscardDraft}
+                  className="flex-1 py-3 border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 text-xs font-semibold rounded-2xl transition active:scale-[0.98]"
+                >
+                  Mulai Baru
+                </button>
+                <button
+                  onClick={handleRestoreDraft}
+                  className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold rounded-2xl shadow-md shadow-rose-200 transition active:scale-[0.98]"
+                >
+                  Pulihkan Draf
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Fullscreen Interactive Preview Modal */}
+      <AnimatePresence>
+        {isFullscreenPreview && (
+          <div className="fixed inset-0 bg-stone-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-[340px] aspect-[9/18] max-h-[94vh] bg-stone-900 rounded-[48px] border-[10px] border-stone-800 shadow-2xl overflow-hidden flex flex-col"
+            >
+              {/* Close Button overlay */}
+              <button
+                onClick={() => setIsFullscreenPreview(false)}
+                className="absolute top-4 right-4 z-40 p-2.5 bg-black/60 hover:bg-black/80 border border-white/10 text-white rounded-full transition shadow-md focus:outline-none cursor-pointer"
+                title="Tutup Pratinjau"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <div className="flex-1 w-full h-full relative overflow-hidden bg-white">
+                <GiftViewer 
+                  key={`fullscreen-${previewKey}-${giftData.theme.flowerStyle}-${giftData.theme.palette}`} 
+                  giftData={giftData} 
+                  isPreview={false}
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
