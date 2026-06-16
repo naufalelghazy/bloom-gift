@@ -138,7 +138,7 @@ export default function CreatorStudio() {
                 Lanjut ke Terbitkan <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
-              <div className="flex items-center gap-3 w-[45%]">
+              <div className="flex items-center gap-2 w-full sm:w-[70%] md:w-[50%]">
                 <input
                   type="text"
                   placeholder="slug-kado (e.g. kado-nara)"
@@ -188,6 +188,18 @@ export default function CreatorStudio() {
         giftData={editor.giftData}
         previewKey={editor.previewKey}
       />
+
+      {/* Floating Preview Button for Mobile viewports */}
+      {!editor.isPublished && (
+        <div className="md:hidden fixed bottom-24 right-6 z-40">
+          <button
+            onClick={() => editor.setIsFullscreenPreview(true)}
+            className="flex items-center gap-1.5 px-4.5 py-3 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-200/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <span>📱</span> Preview Kado
+          </button>
+        </div>
+      )}
 
     </div>
   );

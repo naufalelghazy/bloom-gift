@@ -21,7 +21,7 @@ export default function PhonePreview({
   setIsFullscreenPreview
 }: PhonePreviewProps) {
   return (
-    <div className="w-full md:w-[40%] bg-stone-100 border-l border-stone-200 flex flex-col items-center justify-center p-6 py-12 md:py-6 relative min-h-[600px] md:min-h-screen">
+    <div className="hidden md:flex md:w-[40%] bg-stone-100 border-l border-stone-200 flex-col items-center justify-center p-6 py-12 md:py-6 relative min-h-[600px] md:min-h-screen">
 
       {/* Floating instruction / reload */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
