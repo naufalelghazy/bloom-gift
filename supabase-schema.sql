@@ -6,11 +6,13 @@ CREATE TABLE IF NOT EXISTS public.gifts (
   id TEXT NOT NULL PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,
   status TEXT NOT NULL DEFAULT 'active',
+  "templateId" TEXT DEFAULT 'museum',
   theme JSONB NOT NULL DEFAULT '{}'::jsonb,
   security JSONB NOT NULL DEFAULT '{}'::jsonb,
   "musicUrl" TEXT NOT NULL,
   intro JSONB NOT NULL DEFAULT '{}'::jsonb,
   content JSONB NOT NULL DEFAULT '[]'::jsonb,
+  confession JSONB DEFAULT '{}'::jsonb,
   finale JSONB NOT NULL DEFAULT '{}'::jsonb,
   view_count INTEGER NOT NULL DEFAULT 0,
   opened_at TIMESTAMP WITH TIME ZONE,
@@ -18,6 +20,8 @@ CREATE TABLE IF NOT EXISTS public.gifts (
 );
 
 -- Migrasi: Tambahkan kolom jika tabel sudah ada sebelumnya
+ALTER TABLE public.gifts ADD COLUMN IF NOT EXISTS "templateId" TEXT DEFAULT 'museum';
+ALTER TABLE public.gifts ADD COLUMN IF NOT EXISTS confession JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.gifts ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE public.gifts ADD COLUMN IF NOT EXISTS opened_at TIMESTAMP WITH TIME ZONE;
 

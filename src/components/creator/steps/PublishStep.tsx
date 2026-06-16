@@ -19,6 +19,17 @@ export default function PublishStep({ giftData, saveLocation, setIsPublished, se
     viewCount: 0,
     openedAt: null
   });
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/g/${giftData.slug}` : `https://bloom-gift/g/${giftData.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch((err) => {
+      console.error('Failed to copy text: ', err);
+    });
+  };
 
   useEffect(() => {
     let intervalId: any;
@@ -89,11 +100,23 @@ export default function PublishStep({ giftData, saveLocation, setIsPublished, se
       {/* Dynamic URL Block */}
       <div className="bg-stone-100 p-4 rounded-2xl border border-stone-200/50 text-center max-w-md mx-auto space-y-2">
         <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Tautan Unik Kado Anda</span>
-        <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200">
-          <Link2 className="w-4 h-4 text-stone-400 flex-shrink-0" />
-          <span className="text-xs font-mono font-semibold text-rose-600 truncate">
-            {typeof window !== 'undefined' ? `${window.location.origin}/g/${giftData.slug}` : `/g/${giftData.slug}`}
-          </span>
+        <div className="flex items-center justify-between gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200">
+          <div className="flex items-center gap-2 overflow-hidden flex-1">
+            <Link2 className="w-4 h-4 text-stone-400 flex-shrink-0" />
+            <span className="text-xs font-mono font-semibold text-rose-600 truncate select-all">
+              {typeof window !== 'undefined' ? `${window.location.origin}/g/${giftData.slug}` : `/g/${giftData.slug}`}
+            </span>
+          </div>
+          <button
+            onClick={handleCopyLink}
+            className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all border cursor-pointer ${
+              copied
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                : 'bg-stone-50 hover:bg-stone-100 text-stone-600 border-stone-200'
+            }`}
+          >
+            {copied ? 'Tersalin! ✓' : 'Salin'}
+          </button>
         </div>
       </div>
 
