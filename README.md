@@ -39,36 +39,29 @@ Aplikasi ini terinspirasi dari Laubloom, didesain dengan visual bertema botanica
 
 ---
 
-## 🚀 Memulai Penggunaan (Lokal)
+## 🚀 Coba Aplikasi Secara Langsung
 
-### Prerequisites
-Pastikan Anda sudah menginstal **Node.js** (v18 ke atas) dan memiliki akun **Supabase** jika ingin menghubungkan fitur database cloud.
+Anda dapat langsung mencoba dan membuat kado digital Anda melalui tautan berikut:
+👉 **[bloom-ten-gilt.vercel.app](https://bloom-ten-gilt.vercel.app)**
 
-### 1. Kloning & Install Dependensi
-```bash
-git clone https://github.com/username/bloom-gift.git
-cd bloom-gift
-npm install
-```
+---
 
-### 2. Konfigurasi Environment Variables
-Buat file `.env.local` di root direktori proyek dan isi dengan kredensial Supabase Anda:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
+## 🛠️ Setup & Konfigurasi Database (Untuk Deployment Mandiri)
 
-### 3. Setup Database Supabase
+Jika Anda ingin mendeploy aplikasi ini untuk kebutuhan kustom Anda sendiri:
+
+### 1. Setup Database Supabase
 Jalankan isi dari file [supabase-schema.sql](file:///c:/Users/naufa/.gemini/antigravity/scratch/bloom-gift/supabase-schema.sql) di dalam **SQL Editor** pada Dashboard Supabase Anda. Ini akan membuat:
 - Tabel `gifts` lengkap dengan kolom pelacakan views.
 - PostgreSQL RPC function `increment_gift_views` untuk pencatatan status buka secara aman.
 - Storage bucket `gift-images` dengan RLS Policies yang sesuai untuk upload foto kenangan secara publik.
 
-### 4. Jalankan Server Dev
-```bash
-npm run dev
+### 2. Konfigurasi Environment Variables
+Saat mendeploy (misalnya ke Vercel), tambahkan variabel lingkungan berikut ke dalam konfigurasi environment:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
-Buka [http://localhost:3000](http://localhost:3000) di browser Anda untuk mulai membuat kado digital pertama!
 
 ---
 
