@@ -11,8 +11,8 @@ Aplikasi ini terinspirasi dari Laubloom, didesain dengan visual bertema botanica
 1. **6-Step Creator Studio Wizard**:
    - **Langkah 1**: Pilih skema warna (Preset HSL hangat/pastel atau Slider Hue kustom) dan musik latar (preset instrumental romantis atau upload MP3 sendiri).
    - **Langkah 2**: Atur pengaman (PIN angka, pertanyaan rahasia dengan jawaban unik, atau tanpa pengunci).
-   - **Langkah 3**: Kostumisasi teks pembuka (*Intro Stage*) beserta animasi mekar (Mawar, Hati, Kembang Api, Amplop Segel Lilin, atau Gulungan Naskah).
-   - **Langkah 4**: Tulis cerita/surat cinta & unggah foto kenangan. Mendukung dua template: *Museum Slide* (galeri kartu geser) dan *Confession Card* (kartu pernyataan cinta interaktif).
+   - **Langkah 3**: Kostumisasi teks pembuka (_Intro Stage_) beserta animasi mekar (Mawar, Hati, Kembang Api, Amplop Segel Lilin, atau Gulungan Naskah).
+   - **Langkah 4**: Tulis cerita/surat cinta & unggah foto kenangan. Mendukung dua template: _Museum Slide_ (galeri kartu geser) dan _Confession Card_ (kartu pernyataan cinta interaktif).
    - **Langkah 5**: Pilih jenis buket bunga akhir beserta makna simbolisnya (Mawar merah, Tulip, Peony, Lavender, dll) dan pesan penutup.
    - **Langkah 6**: Publish kado Anda ke database cloud Supabase, dapatkan tautan unik instan beserta QR Code yang siap dibagikan.
 
@@ -25,7 +25,7 @@ Aplikasi ini terinspirasi dari Laubloom, didesain dengan visual bertema botanica
 4. **Optimasi Performa Modern**:
    - Menggunakan format gambar **WebP** untuk loading super cepat di HP murah.
    - Menggunakan komponen **`next/image`** Next.js untuk lazy loading & responsive rendering otomatis.
-   - Font Google (EB Garamond, Caveat, Dancing Script) di-load via **`next/font`** di sisi server (mencegah *flash of unstyled text*).
+   - Font Google (EB Garamond, Caveat, Dancing Script) di-load via **`next/font`** di sisi server (mencegah _flash of unstyled text_).
 
 ---
 
@@ -43,25 +43,6 @@ Aplikasi ini terinspirasi dari Laubloom, didesain dengan visual bertema botanica
 
 Anda dapat langsung mencoba dan membuat kado digital Anda melalui tautan berikut:
 👉 **[bloom-ten-gilt.vercel.app](https://bloom-ten-gilt.vercel.app)**
-
----
-
-## 🛠️ Setup & Konfigurasi Database (Untuk Deployment Mandiri)
-
-Jika Anda ingin mendeploy aplikasi ini untuk kebutuhan kustom Anda sendiri:
-
-### 1. Setup Database Supabase
-Jalankan isi dari file [supabase-schema.sql](file:///c:/Users/naufa/.gemini/antigravity/scratch/bloom-gift/supabase-schema.sql) di dalam **SQL Editor** pada Dashboard Supabase Anda. Ini akan membuat:
-- Tabel `gifts` lengkap dengan kolom pelacakan views.
-- PostgreSQL RPC function `increment_gift_views` untuk pencatatan status buka secara aman.
-- Storage bucket `gift-images` dengan RLS Policies yang sesuai untuk upload foto kenangan secara publik.
-
-### 2. Konfigurasi Environment Variables
-Saat mendeploy (misalnya ke Vercel), tambahkan variabel lingkungan berikut ke dalam konfigurasi environment:
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
 
 ---
 
@@ -91,4 +72,4 @@ bloom-gift/
 ## 🌸 Kontribusi & Lisensi
 
 Dibuat dengan cinta untuk membagikan kebahagiaan kecil. Silakan gunakan template ini untuk membuat kado bagi orang spesial Anda!
-*Copyright © 2026 Bloom Gift Studio.*
+_Copyright © 2026 Bloom Gift Studio._
