@@ -20,7 +20,7 @@ Aplikasi ini terinspirasi dari Laubloom, didesain dengan visual bertema botanica
    - Creator dapat memantau apakah kado digital sudah dibuka oleh pasangannya langsung dari halaman publikasi secara real-time. Status terupdate otomatis begitu halaman kado di-unlock penerima!
 
 3. **Responsive Phone Preview**:
-   - Editor dilengkapi simulator ponsel langsung (WYSIWYG) di sebelah formulir, lengkap dengan tombol uji coba layar penuh untuk melihat animasi persis seperti tampilan di handphone penerima.
+   - Editor dilengkapi simulator ponsel langsung di sebelah formulir, lengkap dengan tombol uji coba layar penuh untuk melihat animasi persis seperti tampilan di handphone penerima.
 
 4. **Optimasi Performa Modern**:
    - Menggunakan format gambar **WebP** untuk loading super cepat di HP murah.
