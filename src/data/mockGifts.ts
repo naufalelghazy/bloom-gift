@@ -54,6 +54,8 @@ export interface GiftData {
     message: string;
     bouquetType: string;
   };
+  view_count?: number;
+  opened_at?: string | null;
 }
 
 export const mockGifts: Record<string, GiftData> = {

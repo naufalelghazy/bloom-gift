@@ -8,6 +8,7 @@ import IntroStage from './stages/IntroStage';
 import StoryStage from './stages/StoryStage';
 import FinaleStage from './stages/FinaleStage';
 import ConfessionStage from './stages/ConfessionStage';
+import { supabase, isSupabaseConfigured } from '@/lib/supabaseClient';
 
 interface GiftViewerProps {
   giftData: GiftData;
@@ -41,6 +42,40 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
   const [stage, setStage] = useState<Stage>(getInitialStage());
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hasIncremented = useRef(false);
+
+  const incrementViews = async () => {
+    if (isPreview || hasIncremented.current) return;
+    hasIncremented.current = true;
+
+    // 1. Update Supabase if configured
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.rpc('increment_gift_views', { gift_id: giftData.id });
+      } catch (err) {
+        console.error('Failed to increment views in Supabase:', err);
+      }
+    }
+
+    // 2. Update local storage fallback
+    try {
+      const localGiftsRaw = localStorage.getItem('bloom_gifts');
+      if (localGiftsRaw) {
+        const localGifts = JSON.parse(localGiftsRaw) as Record<string, GiftData>;
+        if (localGifts[giftData.slug]) {
+          const gift = localGifts[giftData.slug];
+          gift.view_count = (gift.view_count || 0) + 1;
+          if (!gift.opened_at) {
+            gift.opened_at = new Date().toISOString();
+          }
+          localGifts[giftData.slug] = gift;
+          localStorage.setItem('bloom_gifts', JSON.stringify(localGifts));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to update views in local storage:', e);
+    }
+  };
 
   const backgroundGradients: Record<string, string> = {
     pink: 'from-rose-50 via-rose-100/40 to-pink-100/60',
@@ -71,6 +106,7 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
   const handleUnlock = () => {
     setStage('INTRO');
     playMusic();
+    incrementViews();
   };
 
   const handleToggleMute = () => {
@@ -87,6 +123,10 @@ export default function GiftViewer({ giftData, isPreview = false, activeStep = 1
         document.removeEventListener('click', handleFirstClick);
       };
       document.addEventListener('click', handleFirstClick);
+      
+      // Increment views directly since there's no lock gate
+      incrementViews();
+      
       return () => document.removeEventListener('click', handleFirstClick);
     }
   }, [giftData.security.gateType, stage]);
